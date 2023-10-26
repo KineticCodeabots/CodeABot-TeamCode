@@ -37,7 +37,7 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-public class TeamGameElementDetermination implements VisionProcessor {
+public class TeamPropDetermination implements VisionProcessor {
     public Scalar blueLower = new Scalar(0, 0, 140);
     public Scalar blueUpper = new Scalar(255, 130, 255);
     public Scalar redLower = new Scalar(0, 150, 0);
@@ -93,11 +93,11 @@ public class TeamGameElementDetermination implements VisionProcessor {
     int width;
     int height;
 
-    public TeamGameElementDetermination(Telemetry telemetry) {
+    public TeamPropDetermination(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
 
-    public TeamGameElementDetermination(Telemetry telemetry, CodeabotCommon.Alliance alliance) {
+    public TeamPropDetermination(Telemetry telemetry, CodeabotCommon.Alliance alliance) {
         this.telemetry = telemetry;
         this.alliance = alliance;
     }
