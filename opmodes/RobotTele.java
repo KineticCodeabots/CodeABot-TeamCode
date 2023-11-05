@@ -39,10 +39,10 @@ import com.qualcomm.robotcore.util.Range;
 public class RobotTele extends LinearOpMode {
     final private float DRIVE_SMOOTHING = 2;
     final private float TURN_SMOOTHING = 2;
+    final private float ARM_FACTOR = 2;
 
     private ElapsedTime runtime = new ElapsedTime();
     private Robot robot = new Robot(this);
-    ;
 
     @Override
     public void runOpMode() {
@@ -57,6 +57,8 @@ public class RobotTele extends LinearOpMode {
             double turn = smooth(gamepad1.right_stick_x, TURN_SMOOTHING);
 
             robot.driveRobot(drive, turn);
+
+            robot.setArmTarget(robot.armTarget + (int) (gamepad2.left_stick_y * ARM_FACTOR));
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
         }

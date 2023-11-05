@@ -13,24 +13,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class Robot {
-    final private LinearOpMode opMode;
-    final private HardwareMap hardwareMap;
-    final private Telemetry telemetry;
-
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
-    private IMU imu = null;
-
-    // Auto variables
-    private double headingError = 0;
-    private double targetHeading = 0;
-    private double driveSpeed = 0;
-    private double turnSpeed = 0;
-    private double leftSpeed = 0;
-    private double rightSpeed = 0;
-    private int leftTarget = 0;
-    private int rightTarget = 0;
-
     static final double COUNTS_PER_MOTOR_REV = 280;
     static final double DRIVE_GEAR_REDUCTION = 1.0;
     static final double WHEEL_DIAMETER_INCHES = 4.0;
@@ -44,6 +26,31 @@ public class Robot {
 
     static final double ACCELERATION_DISTANCE = 6.0 * COUNTS_PER_INCH;
     static final double MIN_ACCEL_SPEED = 0.1;
+
+    static final double ARM_POWER = 0.3;
+
+    final private LinearOpMode opMode;
+    final private HardwareMap hardwareMap;
+    final private Telemetry telemetry;
+
+    private DcMotor leftDrive = null;
+    private DcMotor rightDrive = null;
+
+    // Auto variables
+    private double headingError = 0;
+    private double targetHeading = 0;
+    private double driveSpeed = 0;
+    private double turnSpeed = 0;
+    private double leftSpeed = 0;
+    private double rightSpeed = 0;
+    private int leftTarget = 0;
+    private int rightTarget = 0;
+
+    private IMU imu = null;
+
+    private DcMotor armMotor = null;
+    public int armTarget = 0;
+
 
     public Robot(LinearOpMode opMode) {
         this.opMode = opMode;
@@ -62,6 +69,11 @@ public class Robot {
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        armMotor = hardwareMap.get(DcMotor.class, "arm");
+
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void setupAuto() {
@@ -236,5 +248,11 @@ public class Robot {
         telemetry.addData("Error  : Steer Pwr", "%5.1f : %5.1f", headingError, turnSpeed);
         telemetry.addData("Wheel Speeds L : R", "%5.2f : %5.2f", leftSpeed, rightSpeed);
         telemetry.update();
+    }
+
+    void setArmTarget(int target) {
+        armTarget = target;
+        armMotor.setTargetPosition(armTarget);
+        armMotor.setPower(ARM_POWER);
     }
 }
