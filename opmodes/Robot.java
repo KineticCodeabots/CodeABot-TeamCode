@@ -112,6 +112,17 @@ public class Robot {
         rightDrive.setPower(right);
     }
 
+    private double rampPower(int currentDistance, int targetDistance, int accelDistance, double maxSpeed) {
+        int remainingDistance = targetDistance - currentDistance;
+        if (currentDistance < accelDistance && remainingDistance > currentDistance) {
+            return Math.max((maxSpeed - MIN_ACCEL_SPEED / accelDistance) * currentDistance + MIN_ACCEL_SPEED, MIN_ACCEL_SPEED);
+        } else if (remainingDistance < ACCELERATION_DISTANCE) {
+            return Math.max((maxSpeed - MIN_ACCEL_SPEED / accelDistance) * remainingDistance + MIN_ACCEL_SPEED, MIN_ACCEL_SPEED);
+        } else {
+            return maxSpeed;
+        }
+    }
+
     public void driveStraight(double maxDriveSpeed,
                               double distance,
                               double heading) {
