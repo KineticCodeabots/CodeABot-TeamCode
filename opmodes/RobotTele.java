@@ -50,9 +50,6 @@ public class RobotTele extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            double leftPower;
-            double rightPower;
-
             double drive = smooth(-gamepad1.left_stick_y, DRIVE_SMOOTHING);
             double turn = smooth(gamepad1.right_stick_x, TURN_SMOOTHING);
 
