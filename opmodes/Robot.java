@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class Robot {
-    static final double COUNTS_PER_MOTOR_REV = 280;
+    static final double COUNTS_PER_MOTOR_REV = 1120;
     static final double DRIVE_GEAR_REDUCTION = 1.0;
     static final double WHEEL_DIAMETER_INCHES = 4.0;
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
@@ -27,15 +27,6 @@ public class Robot {
     static final double ACCELERATION_DISTANCE = 6.0 * COUNTS_PER_INCH;
     static final double MIN_ACCEL_SPEED = 0.1;
 
-    static final double ARM_POWER = 0.3;
-
-    final private LinearOpMode opMode;
-    final private HardwareMap hardwareMap;
-    final private Telemetry telemetry;
-
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
-
     // Auto variables
     private double headingError = 0;
     private double targetHeading = 0;
@@ -45,12 +36,18 @@ public class Robot {
     private double rightSpeed = 0;
     private int leftTarget = 0;
     private int rightTarget = 0;
-
     private IMU imu = null;
 
+    private DcMotor leftDrive = null;
+    private DcMotor rightDrive = null;
+
+    static final double ARM_POWER = 0.3;
     private DcMotor armMotor = null;
     public int armTarget = 0;
 
+    final private LinearOpMode opMode;
+    final private HardwareMap hardwareMap;
+    final private Telemetry telemetry;
 
     public Robot(LinearOpMode opMode) {
         this.opMode = opMode;
