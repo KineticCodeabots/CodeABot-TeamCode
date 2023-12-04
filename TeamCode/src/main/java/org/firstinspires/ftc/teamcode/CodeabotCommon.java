@@ -5,4 +5,8 @@ public class CodeabotCommon {
         BLUE,
         RED
     }
+    public enum StartingLocation {
+        AUDIENCE,
+        BACKDROP
+    }
 }

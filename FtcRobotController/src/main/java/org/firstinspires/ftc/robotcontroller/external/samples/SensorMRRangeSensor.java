@@ -27,42 +27,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.robotcontroller.external.samples;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@TeleOp(name = "RobotTele", group = "Robot")
-public class RobotTele extends LinearOpMode {
-    final private float DRIVE_SMOOTHING = 2;
-    final private float TURN_SMOOTHING = 2;
-    final private float ARM_FACTOR = 2;
+/*
+ * This OpMode illustrates how to use the Modern Robotics Range Sensor.
+ *
+ * The OpMode assumes that the range sensor is configured with a name of "sensor_range".
+ *
+ * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
+ * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
+ *
+ * @see <a href="http://modernroboticsinc.com/range-sensor">MR Range Sensor</a>
+ */
+@TeleOp(name = "Sensor: MR range sensor", group = "Sensor")
+@Disabled   // comment out or remove this line to enable this OpMode
+public class SensorMRRangeSensor extends LinearOpMode {
 
-    private ElapsedTime runtime = new ElapsedTime();
-    private Robot robot = new Robot(this);
+    ModernRoboticsI2cRangeSensor rangeSensor;
 
-    @Override
-    public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
+    @Override public void runOpMode() {
 
+        // get a reference to our compass
+        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "sensor_range");
+
+        // wait for the start button to be pressed
         waitForStart();
+
         while (opModeIsActive()) {
-            double drive = smooth(-gamepad1.left_stick_y, DRIVE_SMOOTHING);
-            double turn = smooth(gamepad1.right_stick_x, TURN_SMOOTHING);
-
-            robot.driveRobot(drive, turn);
-
-            robot.setArmTarget(robot.armTarget + (int) (gamepad2.left_stick_y * ARM_FACTOR));
-
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("raw ultrasonic", rangeSensor.rawUltrasonic());
+            telemetry.addData("raw optical", rangeSensor.rawOptical());
+            telemetry.addData("cm optical", "%.2f cm", rangeSensor.cmOptical());
+            telemetry.addData("cm", "%.2f cm", rangeSensor.getDistance(DistanceUnit.CM));
+            telemetry.update();
         }
-    }
-
-
-    private double smooth(float x, float factor) {
-        return Math.pow(Math.abs(x), factor) * Math.signum(x);
     }
 }

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -46,8 +47,8 @@ public class Robot {
     public int armTarget = 0;
 
     final private LinearOpMode opMode;
-    final private HardwareMap hardwareMap;
-    final private Telemetry telemetry;
+    private HardwareMap hardwareMap;
+    private Telemetry telemetry;
 
     public Robot(LinearOpMode opMode) {
         this.opMode = opMode;
@@ -56,6 +57,9 @@ public class Robot {
     }
 
     public void init() {
+        hardwareMap = opMode.hardwareMap;
+        telemetry = opMode.telemetry;
+
         leftDrive = hardwareMap.get(DcMotor.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
 
@@ -70,7 +74,7 @@ public class Robot {
         armMotor = hardwareMap.get(DcMotor.class, "arm");
 
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void setupAuto() {
@@ -105,6 +109,8 @@ public class Robot {
     }
 
     public void setDrivePower(double left, double right) {
+        leftSpeed = left;
+        rightSpeed = right;
         leftDrive.setPower(left);
         rightDrive.setPower(right);
     }
@@ -256,6 +262,9 @@ public class Robot {
         telemetry.addData("Error  : Steer Pwr", "%5.1f : %5.1f", headingError, turnSpeed);
         telemetry.addData("Wheel Speeds L : R", "%5.2f : %5.2f", leftSpeed, rightSpeed);
         telemetry.update();
+    }
+    public void sendDriveSpeedTelemetry() {
+        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftSpeed, rightSpeed);
     }
 
     void setArmTarget(int target) {
