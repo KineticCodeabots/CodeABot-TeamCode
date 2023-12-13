@@ -25,9 +25,6 @@ public class Robot {
     static final double P_TURN_GAIN = 0.02;
     static final double P_DRIVE_GAIN = 0.03;
 
-    static final double ACCELERATION_DISTANCE = 6.0 * COUNTS_PER_INCH;
-    static final double MIN_ACCEL_SPEED = 0.1;
-
     // Auto variables
     private double headingError = 0;
     private double targetHeading = 0;
@@ -115,17 +112,6 @@ public class Robot {
         rightDrive.setPower(right);
     }
 
-    private double rampPower(int currentDistance, int targetDistance, int accelDistance, double maxSpeed) {
-        int remainingDistance = targetDistance - currentDistance;
-        if (currentDistance < accelDistance && remainingDistance > currentDistance) {
-            return Math.max((maxSpeed - MIN_ACCEL_SPEED / accelDistance) * currentDistance + MIN_ACCEL_SPEED, MIN_ACCEL_SPEED);
-        } else if (remainingDistance < ACCELERATION_DISTANCE) {
-            return Math.max((maxSpeed - MIN_ACCEL_SPEED / accelDistance) * remainingDistance + MIN_ACCEL_SPEED, MIN_ACCEL_SPEED);
-        } else {
-            return maxSpeed;
-        }
-    }
-
     public void driveStraight(double maxDriveSpeed,
                               double distance,
                               double heading) {
@@ -135,8 +121,6 @@ public class Robot {
 
             // Determine new target position, and pass to motor controller
             int moveCounts = (int) (distance * COUNTS_PER_INCH);
-            int leftStart = leftDrive.getCurrentPosition();
-            int rightStart = rightDrive.getCurrentPosition();
             leftTarget = leftDrive.getCurrentPosition() + moveCounts;
             rightTarget = rightDrive.getCurrentPosition() + moveCounts;
 
@@ -155,17 +139,6 @@ public class Robot {
             // keep looping while we are still active, and BOTH motors are running.
             while (opMode.opModeIsActive() &&
                     (leftDrive.isBusy() && rightDrive.isBusy())) {
-
-                int currentDistance = Math.min(Math.abs(leftDrive.getCurrentPosition() - leftStart), Math.abs(rightDrive.getCurrentPosition() - rightStart));
-                int remainingDistance = Math.max(Math.abs(leftTarget - leftDrive.getCurrentPosition()), Math.abs(rightTarget - rightDrive.getCurrentPosition()));
-                if (currentDistance < ACCELERATION_DISTANCE) {
-                    driveSpeed = Math.max((maxDriveSpeed / ACCELERATION_DISTANCE) * currentDistance, MIN_ACCEL_SPEED);
-                } else if (remainingDistance < ACCELERATION_DISTANCE) {
-                    driveSpeed = Math.max((maxDriveSpeed / ACCELERATION_DISTANCE) * remainingDistance, MIN_ACCEL_SPEED);
-                } else {
-                    driveSpeed = maxDriveSpeed;
-                }
-
                 // Determine required steering to keep on heading
                 turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
 
