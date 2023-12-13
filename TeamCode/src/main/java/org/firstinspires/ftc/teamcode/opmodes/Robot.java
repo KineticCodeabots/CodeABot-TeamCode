@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -104,6 +103,40 @@ public class Robot {
 
         setDrivePower(left, right);
     }
+
+    public void driveRobotAccel(double drive, double turn, int accelDistance, int currentPosition, int targetPosition) {
+        driveSpeed = drive;
+        turnSpeed = turn;
+
+        // Calculate left and right wheel speeds
+        double left = drive + turn;
+        double right = drive - turn;
+
+        // Scale the values so neither exceed +/- 1.0
+        double max = Math.max(Math.abs(left), Math.abs(right));
+        if (max > 1.0) {
+            left /= max;
+            right /= max;
+        }
+
+        // Calculate scaled speed based on currentPosition and targetPosition
+        double scaledSpeed;
+        if (currentPosition < accelDistance) {
+            scaledSpeed = ((double) currentPosition / accelDistance);
+        } else if (currentPosition > (targetPosition - accelDistance)) {
+            scaledSpeed = ((double) (targetPosition - currentPosition) / accelDistance);
+        } else {
+            scaledSpeed = max;
+        }
+
+        // Apply scaled speed to left and right wheel speeds
+        left *= scaledSpeed;
+        right *= scaledSpeed;
+
+        // Set the final drive power
+        setDrivePower(left, right);
+    }
+
 
     public void setDrivePower(double left, double right) {
         leftSpeed = left;
