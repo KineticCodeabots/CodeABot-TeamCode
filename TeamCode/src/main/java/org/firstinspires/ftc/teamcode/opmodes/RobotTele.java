@@ -46,7 +46,7 @@ public class RobotTele extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot.init();
+        robot.init(false);
         telemetry.addData("Status", "Initialized");
 
         waitForStart();

@@ -12,7 +12,7 @@ public abstract class AutoBase extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot.setupAuto();
+        robot.init(true);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
