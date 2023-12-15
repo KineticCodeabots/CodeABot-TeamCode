@@ -24,6 +24,11 @@ public class Robot {
     static final double P_TURN_GAIN = 0.02;
     static final double P_DRIVE_GAIN = 0.03;
 
+    static final int ACCEL_DISTANCE_GAIN = (int) (10 * COUNTS_PER_INCH);
+    static final int DECEL_DISTANCE_GAIN = (int) (20 * COUNTS_PER_INCH);
+    static final double MIN_ACCEL_SPEED = 0.2;
+    static final double MIN_DECEL_SPEED = 0.05;
+
     // Auto variables
     private double headingError = 0;
     private double targetHeading = 0;
@@ -35,6 +40,7 @@ public class Robot {
     private int rightTarget = 0;
     private IMU imu = null;
 
+    // Hardware
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
 
@@ -42,6 +48,7 @@ public class Robot {
     private DcMotor armMotor = null;
     public int armTarget = 0;
 
+    // OpMode
     final private LinearOpMode opMode;
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
@@ -52,6 +59,7 @@ public class Robot {
         this.telemetry = opMode.telemetry;
     }
 
+    // Initialize hardware
     public void init(boolean auto) {
         hardwareMap = opMode.hardwareMap;
         telemetry = opMode.telemetry;
@@ -86,7 +94,7 @@ public class Robot {
     }
 
     public void startAuto() {
-        imu.resetYaw();
+        imu.resetYaw(); // Resets heading to 0
     }
 
     public void driveRobot(double drive, double turn) {
@@ -106,40 +114,6 @@ public class Robot {
         setDrivePower(left, right);
     }
 
-    public void driveRobotAccel(double drive, double turn, int accelDistance, int currentPosition, int targetPosition) {
-        driveSpeed = drive;
-        turnSpeed = turn;
-
-        // Calculate left and right wheel speeds
-        double left = drive + turn;
-        double right = drive - turn;
-
-        // Scale the values so neither exceed +/- 1.0
-        double max = Math.max(Math.abs(left), Math.abs(right));
-        if (max > 1.0) {
-            left /= max;
-            right /= max;
-        }
-
-        // Calculate scaled speed based on currentPosition and targetPosition
-        double scaledSpeed;
-        if (currentPosition < accelDistance) {
-            scaledSpeed = ((double) currentPosition / accelDistance);
-        } else if (currentPosition > (targetPosition - accelDistance)) {
-            scaledSpeed = ((double) (targetPosition - currentPosition) / accelDistance);
-        } else {
-            scaledSpeed = max;
-        }
-
-        // Apply scaled speed to left and right wheel speeds
-        left *= scaledSpeed;
-        right *= scaledSpeed;
-
-        // Set the final drive power
-        setDrivePower(left, right);
-    }
-
-
     public void setDrivePower(double left, double right) {
         leftSpeed = left;
         rightSpeed = right;
@@ -152,47 +126,61 @@ public class Robot {
                               double heading) {
 
         // Ensure that the OpMode is still active
-        if (opMode.opModeIsActive()) {
+        if (!opMode.opModeIsActive()) return;
 
-            // Determine new target position, and pass to motor controller
-            int moveCounts = (int) (distance * COUNTS_PER_INCH);
-            leftTarget = leftDrive.getCurrentPosition() + moveCounts;
-            rightTarget = rightDrive.getCurrentPosition() + moveCounts;
+        // Determine new target position, and pass to motor controller
+        int accelDistance = (int) (ACCEL_DISTANCE_GAIN * maxDriveSpeed);
+        int decelDistance = (int) (DECEL_DISTANCE_GAIN * maxDriveSpeed);
+        int moveCounts = (int) (distance * COUNTS_PER_INCH);
+        int targetPosition = Math.abs(moveCounts);
+        int leftStart = leftDrive.getCurrentPosition();
+        int rightStart = rightDrive.getCurrentPosition();
+        leftTarget = leftDrive.getCurrentPosition() + moveCounts;
+        rightTarget = rightDrive.getCurrentPosition() + moveCounts;
 
-            // Set Target FIRST, then turn on RUN_TO_POSITION
-            leftDrive.setTargetPosition(leftTarget);
-            rightDrive.setTargetPosition(rightTarget);
+        // Set Target FIRST, then turn on RUN_TO_POSITION
+        leftDrive.setTargetPosition(leftTarget);
+        rightDrive.setTargetPosition(rightTarget);
 
-            leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            // Set the required driving speed  (must be positive for RUN_TO_POSITION)
-            // Start driving straight, and then enter the control loop
-            maxDriveSpeed = Math.abs(maxDriveSpeed);
-            driveRobot(maxDriveSpeed, 0);
+        // Set the required driving speed  (must be positive for RUN_TO_POSITION)
+        // Start driving straight, and then enter the control loop
+        maxDriveSpeed = Math.abs(maxDriveSpeed);
+        driveRobot(Math.min(MIN_ACCEL_SPEED, maxDriveSpeed), 0);
 
-            // keep looping while we are still active, and BOTH motors are running.
-            while (opMode.opModeIsActive() &&
-                    (leftDrive.isBusy() && rightDrive.isBusy())) {
-                // Determine required steering to keep on heading
-                turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
-
-                // if driving in reverse, the motor correction also needs to be reversed
-                if (distance < 0)
-                    turnSpeed *= -1.0;
-
-                // Apply the turning correction to the current driving speed.
-                driveRobot(driveSpeed, turnSpeed);
-
-                // Display drive status for the driver.
-                sendAutoTelemetry(true);
+        // keep looping while we are still active, and BOTH motors are running.
+        while (opMode.opModeIsActive() &&
+                (leftDrive.isBusy() && rightDrive.isBusy())) {
+            int currentPosition = Math.max(Math.abs(leftDrive.getCurrentPosition() - leftStart), Math.abs(rightDrive.getCurrentPosition() - rightStart));
+            double accelSpeed;
+            if (currentPosition < accelDistance) {
+                accelSpeed = Math.max(((double) currentPosition / accelDistance) * maxDriveSpeed, MIN_ACCEL_SPEED);
+            } else if (currentPosition > (targetPosition - decelDistance)) {
+                accelSpeed = Math.max((((double) targetPosition - currentPosition) / decelDistance) * maxDriveSpeed, MIN_DECEL_SPEED);
+            } else {
+                accelSpeed = maxDriveSpeed;
             }
 
-            // Stop all motion & Turn off RUN_TO_POSITION
-            driveRobot(0, 0);
-            leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            // Determine required steering to keep on heading
+            turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
+
+            // if driving in reverse, the motor correction also needs to be reversed
+            if (distance < 0)
+                turnSpeed *= -1.0;
+
+            // Apply the turning correction to the current driving speed.
+            driveRobot(Math.min(accelSpeed, maxDriveSpeed), turnSpeed);
+
+            // Display drive status for the driver.
+            sendAutoTelemetry(true);
         }
+
+        // Stop all motion & Turn off RUN_TO_POSITION
+        driveRobot(0, 0);
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void turnToHeading(double maxTurnSpeed, double heading) {
@@ -271,6 +259,7 @@ public class Robot {
         telemetry.addData("Wheel Speeds L : R", "%5.2f : %5.2f", leftSpeed, rightSpeed);
         telemetry.update();
     }
+
     public void sendDriveSpeedTelemetry() {
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftSpeed, rightSpeed);
     }
