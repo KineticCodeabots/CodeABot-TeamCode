@@ -30,16 +30,22 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "RobotTele", group = "Robot")
 public class RobotTele extends LinearOpMode {
-    final private float DRIVE_SMOOTHING = 2;
-    final private float TURN_SMOOTHING = 2;
-    final private float ARM_FACTOR = 2;
+    final private double DRIVE_SMOOTHING = 2;
+    final private double TURN_SMOOTHING = 2;
+    final private double ARM_GAIN = 2;
+    final private double HAND_GAIN = 0.01;
+
+    Gamepad currentGamepad1 = new Gamepad();
+    Gamepad currentGamepad2 = new Gamepad();
+
+    Gamepad previousGamepad1 = new Gamepad();
+    Gamepad previousGamepad2 = new Gamepad();
 
     private ElapsedTime runtime = new ElapsedTime();
     private Robot robot = new Robot(this);
@@ -48,15 +54,28 @@ public class RobotTele extends LinearOpMode {
     public void runOpMode() {
         robot.init(false);
         telemetry.addData("Status", "Initialized");
+        telemetry.update();
 
         waitForStart();
         while (opModeIsActive()) {
+            previousGamepad1.copy(currentGamepad1);
+            previousGamepad2.copy(currentGamepad2);
+
+            currentGamepad1.copy(gamepad1);
+            currentGamepad2.copy(gamepad2);
+
+
             double drive = smooth(-gamepad1.left_stick_y, DRIVE_SMOOTHING);
             double turn = smooth(gamepad1.right_stick_x, TURN_SMOOTHING);
 
             robot.driveRobot(drive, turn);
 
-            robot.setArmTarget(robot.armTarget + (int) (gamepad2.left_stick_y * ARM_FACTOR));
+            robot.setArmTarget(robot.armTarget + (int) (gamepad2.left_stick_y * ARM_GAIN));
+            robot.setHandPosition(robot.handPosition + (gamepad2.right_stick_y * HAND_GAIN));
+
+            if (currentGamepad2.x && !previousGamepad2.x) {
+                robot.setGripperPosition(!robot.gripperOpen);
+            }
 
             robot.sendDriveSpeedTelemetry();
             telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -65,7 +84,7 @@ public class RobotTele extends LinearOpMode {
     }
 
 
-    private double smooth(float x, float factor) {
+    private double smooth(double x, double factor) {
         return Math.pow(Math.abs(x), factor) * Math.signum(x);
     }
 }
