@@ -90,6 +90,8 @@ public class Robot {
 
         handServo = hardwareMap.get(Servo.class, "hand");
 
+        gripperServo = hardwareMap.get(Servo.class, "gripper");
+
         if (auto) {
             leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
