@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -48,6 +49,13 @@ public class Robot {
     private DcMotor armMotor = null;
     public int armTarget = 0;
 
+    private Servo handServo = null;
+    public double handPosition = 0;
+
+    private Servo gripperServo = null;
+    public double gripperPosition = 0;
+    public boolean gripperOpen = false;
+
     // OpMode
     final private LinearOpMode opMode;
     private HardwareMap hardwareMap;
@@ -80,6 +88,8 @@ public class Robot {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        handServo = hardwareMap.get(Servo.class, "hand");
+
         if (auto) {
             leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -90,6 +100,9 @@ public class Robot {
 
             imu = hardwareMap.get(IMU.class, "imu");
             imu.initialize(new IMU.Parameters(orientationOnRobot));
+        } else {
+            leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         }
     }
 
@@ -268,5 +281,20 @@ public class Robot {
         armTarget = target;
         armMotor.setTargetPosition(armTarget);
         armMotor.setPower(ARM_POWER);
+    }
+
+    void setHandPosition(double position) {
+        handPosition = position;
+        handServo.setPosition(position);
+    }
+
+    void setGripperPosition(boolean open) {
+        gripperOpen = open;
+        if (open) {
+            gripperPosition = 0.5;
+        } else {
+            gripperPosition = 0;
+        }
+        gripperServo.setPosition(gripperPosition);
     }
 }
