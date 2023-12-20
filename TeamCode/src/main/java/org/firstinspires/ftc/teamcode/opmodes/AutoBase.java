@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.CodeabotCommon;
 
 public abstract class AutoBase extends LinearOpMode {
-    private final double DRIVE_SPEED = 0.7;
-    private final double TURN_SPEED = 0.2;
+    private static final double DRIVE_SPEED = 0.7;
+    private static final double TURN_SPEED = 0.2;
 
     private final CodeabotCommon.Alliance alliance = CodeabotCommon.Alliance.BLUE;
     private final CodeabotCommon.StartingLocation startingLocation = CodeabotCommon.StartingLocation.AUDIENCE;
