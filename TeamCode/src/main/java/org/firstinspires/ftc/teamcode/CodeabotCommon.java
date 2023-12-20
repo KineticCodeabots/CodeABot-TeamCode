@@ -7,6 +7,6 @@ public class CodeabotCommon {
     }
     public enum StartingLocation {
         AUDIENCE,
-        BACKDROP
+        BACKSTAGE
     }
 }
