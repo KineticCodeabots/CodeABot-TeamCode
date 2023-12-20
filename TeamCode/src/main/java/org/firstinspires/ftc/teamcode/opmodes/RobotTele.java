@@ -57,6 +57,7 @@ public class RobotTele extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
+        runtime.reset();
         while (opModeIsActive()) {
             previousGamepad1.copy(currentGamepad1);
             previousGamepad2.copy(currentGamepad2);
