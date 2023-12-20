@@ -11,15 +11,15 @@ public abstract class AutoBase extends LinearOpMode {
     private final CodeabotCommon.Alliance alliance = CodeabotCommon.Alliance.BLUE;
     private final CodeabotCommon.StartingLocation startingLocation = CodeabotCommon.StartingLocation.AUDIENCE;
 
-    private Robot robot = new Robot(this);
+    final private AutoRobot robot = new AutoRobot(this);
 
     @Override
     public void runOpMode() {
-        robot.init(true);
+        robot.init();
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        robot.startAuto();
+        robot.start();
         robot.driveStraight(DRIVE_SPEED, 33, 0);
         alianceTurnToHeading(TURN_SPEED, -90);
         if (startingLocation == CodeabotCommon.StartingLocation.AUDIENCE) {

@@ -52,7 +52,7 @@ public class RobotTele extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot.init(false);
+        robot.init();
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -77,7 +77,7 @@ public class RobotTele extends LinearOpMode {
                 robot.setGripperPosition(!robot.gripperOpen);
             }
 
-            robot.sendDriveSpeedTelemetry();
+            robot.sendMotorTelemetry();
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
