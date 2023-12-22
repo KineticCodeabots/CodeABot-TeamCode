@@ -45,9 +45,10 @@ public class Robot {
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
 
-    static final double ARM_POWER = 0.3;
+    static final double ARM_POWER = 0.1;
     private DcMotor armMotor = null;
     public int armTarget = 0;
+    public double armPower = 0;
 
     private Servo handServo = null;
     public double handPosition = 0;
@@ -87,8 +88,10 @@ public class Robot {
 
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         handServo = hardwareMap.get(Servo.class, "hand");
+        handServo.setDirection(Servo.Direction.REVERSE);
 
         gripperServo = hardwareMap.get(Servo.class, "gripper");
 
@@ -275,19 +278,29 @@ public class Robot {
         telemetry.update();
     }
 
-    public void sendDriveSpeedTelemetry() {
+    public void sendRobotTelemetry() {
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftSpeed, rightSpeed);
+        telemetry.addData("Arm", "target (%d), power (%.2f)", armTarget, armPower);
+        telemetry.addData("Hand", "position (%.2f)", handPosition);
+        telemetry.addData("Gripper", "position (%.2f), open (%b)", gripperPosition, gripperOpen);
     }
 
     void setArmTarget(int target) {
         armTarget = target;
+        armPower = ARM_POWER;
         armMotor.setTargetPosition(armTarget);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setPower(ARM_POWER);
     }
 
+    void setArmPower(double power) {
+        armPower = power;
+        armMotor.setPower(power);
+    }
+
     void setHandPosition(double position) {
-        handPosition = position;
-        handServo.setPosition(position);
+        handPosition = Range.clip(position, 0, 1);
+        handServo.setPosition(handPosition);
     }
 
     void setGripperPosition(boolean open) {
@@ -299,4 +312,6 @@ public class Robot {
         }
         gripperServo.setPosition(gripperPosition);
     }
+
+
 }
