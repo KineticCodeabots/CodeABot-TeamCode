@@ -39,7 +39,8 @@ public class RobotTele extends LinearOpMode {
     final private double DRIVE_SMOOTHING = 2;
     final private double TURN_SMOOTHING = 2;
     final private double ARM_GAIN = 2;
-    final private double HAND_GAIN = 0.01;
+    final static private double ARM_MAX = 0.5;
+    final private double HAND_GAIN = 0.001;
 
     Gamepad currentGamepad1 = new Gamepad();
     Gamepad currentGamepad2 = new Gamepad();
@@ -71,13 +72,14 @@ public class RobotTele extends LinearOpMode {
             robot.driveRobot(drive, turn);
 
             robot.setArmTarget(robot.armTarget + (int) (gamepad2.left_stick_y * ARM_GAIN));
+//            robot.setArmPower(gamepad2.left_stick_y * ARM_MAX);
             robot.setHandPosition(robot.handPosition + (gamepad2.right_stick_y * HAND_GAIN));
 
             if (currentGamepad2.x && !previousGamepad2.x) {
                 robot.setGripperPosition(!robot.gripperOpen);
             }
 
-            robot.sendDriveSpeedTelemetry();
+            robot.sendRobotTelemetry();
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
