@@ -20,6 +20,7 @@ public abstract class AutoBase extends LinearOpMode {
         telemetry.update();
         waitForStart();
         robot.start();
+        robot.resetServos();
         robot.driveStraight(DRIVE_SPEED, 33, 0);
         alianceTurnToHeading(TURN_SPEED, -90);
         if (startingLocation == CodeabotCommon.StartingLocation.AUDIENCE) {
