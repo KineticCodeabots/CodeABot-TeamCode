@@ -16,7 +16,6 @@ public class Robot {
     public double leftSpeed = 0;
     public double rightSpeed = 0;
 
-    static final double ARM_POWER = 0.3;
     private DcMotor armMotor = null;
     public int armTarget = 0;
 
@@ -58,8 +57,10 @@ public class Robot {
 
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         handServo = hardwareMap.get(Servo.class, "hand");
+        handServo.setDirection(Servo.Direction.REVERSE);
 
         gripperServo = hardwareMap.get(Servo.class, "gripper");
 
@@ -95,14 +96,51 @@ public class Robot {
         rightDrive.setPower(right);
     }
 
-    public void sendMotorTelemetry() {
+    /**
+     * Does not call telemetry.update().
+     */
+    public void sendTelemetry() {
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftSpeed, rightSpeed);
+        telemetry.addData("Arm", "target (%d), power (%.2f)", armTarget, armMotor.getPower());
+        telemetry.addData("Hand", "position (%.2f)", handPosition);
+        telemetry.addData("Gripper", "position (%.2f), open (%b)", gripperPosition, gripperOpen);
     }
 
-    void setArmTarget(int target) {
-        armTarget = target;
-        armMotor.setTargetPosition(armTarget);
-        armMotor.setPower(ARM_POWER);
+    void resetServos() {
+        setHandState(HandState.UP);
+        setGripperState(true);
+    }
+
+    void setArmPower(double power) {
+        armMotor.setPower(power);
+    }
+
+    public enum HandState {
+        DOWN,
+        BACKBOARD,
+        UP
+    }
+    void setHandState(HandState state) {
+        switch (state) {
+            case DOWN:
+                setHandPosition(0);
+                break;
+            case BACKBOARD:
+                setHandPosition(0.5);
+                break;
+            case UP:
+                setHandPosition(1);
+                break;
+        }
+    }
+    public HandState getHandState() {
+        if (handPosition == 0) {
+            return HandState.DOWN;
+        } else if (handPosition == 0.5) {
+            return HandState.BACKBOARD;
+        } else if (handPosition == 1) {
+            return HandState.UP;
+        } else return null;
     }
 
     void setHandPosition(double position) {
@@ -110,13 +148,17 @@ public class Robot {
         handServo.setPosition(position);
     }
 
-    void setGripperPosition(boolean open) {
+    void setGripperState(boolean open) {
         gripperOpen = open;
         if (open) {
             gripperPosition = 0.5;
         } else {
             gripperPosition = 0;
         }
-        gripperServo.setPosition(gripperPosition);
+        setGripperPosition(gripperPosition);
+    }
+    void setGripperPosition(double position) {
+        gripperPosition = position;
+        gripperServo.setPosition(position);
     }
 }
