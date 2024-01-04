@@ -17,7 +17,6 @@ public class Robot {
     public double rightSpeed = 0;
 
     private DcMotor armMotor = null;
-    public int armTarget = 0;
 
     public Servo handServo = null;
     public double handPosition = 0;
@@ -100,9 +99,9 @@ public class Robot {
      * Does not call telemetry.update().
      */
     public void sendTelemetry() {
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftSpeed, rightSpeed);
-        telemetry.addData("Arm", "target (%d), power (%.2f)", armTarget, armMotor.getPower());
-        telemetry.addData("Hand", "position (%.2f)", handPosition);
+        telemetry.addData("Drive", "left (%.2f), right (%.2f)", leftSpeed, rightSpeed);
+        telemetry.addData("Arm", "power (%.2f)", armMotor.getPower());
+        telemetry.addData("Hand", "position (%.2f), state (%s)", handPosition, getHandState());
         telemetry.addData("Gripper", "position (%.2f), open (%b)", gripperPosition, gripperOpen);
     }
 
