@@ -39,9 +39,14 @@ public abstract class AutoBase extends LinearOpMode {
             telemetry.update();
         }
         waitForStart();
+
+        TeamPropDetermination.Position teamPropPosition = teamPropDeterminationProcessor.getPosition();
+
         robot.start();
         robot.resetServos();
+
         robot.driveStraight(DRIVE_SPEED, 33, 0);
+        // TODO: implement spike mark scoring
         alianceTurnToHeading(TURN_SPEED, -90);
         if (startingLocation == CodeabotCommon.StartingLocation.AUDIENCE) {
             robot.driveStraight(DRIVE_SPEED, 80, -90);
