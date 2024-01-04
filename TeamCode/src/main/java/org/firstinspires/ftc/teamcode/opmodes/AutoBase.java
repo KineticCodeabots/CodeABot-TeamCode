@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import android.util.Size;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.CodeabotCommon;
+import org.firstinspires.ftc.teamcode.vision.TeamPropDetermination;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 public abstract class AutoBase extends LinearOpMode {
     private static final double DRIVE_SPEED = 0.7;
@@ -16,8 +21,23 @@ public abstract class AutoBase extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot.init();
+        TeamPropDetermination teamPropDeterminationProcessor = new TeamPropDetermination(telemetry, alliance);
+
+        VisionPortal.Builder visionPortalBuilder = new VisionPortal.Builder();
+        visionPortalBuilder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .addProcessor(teamPropDeterminationProcessor)
+                .setCameraResolution(new Size(640, 480))
+                .enableLiveView(true)
+                .setAutoStopLiveView(true)
+                .build();
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+        while (opModeInInit()) {
+            teamPropDeterminationProcessor.addTelemetry();
+            telemetry.update();
+        }
         waitForStart();
         robot.start();
         robot.resetServos();

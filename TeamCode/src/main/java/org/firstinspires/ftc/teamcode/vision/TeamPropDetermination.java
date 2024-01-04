@@ -123,12 +123,6 @@ public class TeamPropDetermination implements VisionProcessor {
 
         Position position = getPosition();
 
-        telemetry.addData("Position", position);
-        telemetry.addData("Left Score", leftRegion.score);
-        telemetry.addData("Center Score", centerRegion.score);
-        telemetry.addData("Right Score", rightRegion.score);
-        telemetry.update();
-
         return position;
     }
 
@@ -140,6 +134,15 @@ public class TeamPropDetermination implements VisionProcessor {
         } else {
             return Position.RIGHT;
         }
+    }
+
+    public void addTelemetry() {
+        Position position = getPosition();
+
+        telemetry.addData("Position", position);
+        telemetry.addData("Left Score", leftRegion.score);
+        telemetry.addData("Center Score", centerRegion.score);
+        telemetry.addData("Right Score", rightRegion.score);
     }
 
     private android.graphics.Rect makeGraphicsRect(Rect rect, float scaleBmpPxToCanvasPx) {
