@@ -47,6 +47,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         robot.driveStraight(DRIVE_SPEED, 33, 0);
         // TODO: implement spike mark scoring
+        robot.setGripperState(false);
         alianceTurnToHeading(TURN_SPEED, -90);
         if (startingLocation == CodeabotCommon.StartingLocation.AUDIENCE) {
             robot.driveStraight(DRIVE_SPEED, 80, -90);
