@@ -9,18 +9,22 @@ import org.firstinspires.ftc.teamcode.CodeabotCommon;
 import org.firstinspires.ftc.teamcode.vision.TeamPropDetermination;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-public abstract class AutoBase extends LinearOpMode {
+public abstract class BaseAuto extends LinearOpMode {
+    // Constants
     private static final double DRIVE_SPEED = 0.7;
     private static final double TURN_SPEED = 0.2;
 
+    // Match State
     private final CodeabotCommon.Alliance alliance = CodeabotCommon.Alliance.BLUE;
     private final CodeabotCommon.StartingLocation startingLocation = CodeabotCommon.StartingLocation.AUDIENCE;
 
     final private AutoRobot robot = new AutoRobot(this);
+    // TODO: add runtime maybe?
 
     @Override
     public void runOpMode() {
         robot.init();
+        // Initialize VisionPortal and TeamPropDetermination
         TeamPropDetermination teamPropDeterminationProcessor = new TeamPropDetermination(telemetry, alliance);
 
         VisionPortal.Builder visionPortalBuilder = new VisionPortal.Builder();
@@ -35,11 +39,13 @@ public abstract class AutoBase extends LinearOpMode {
         telemetry.update();
 
         while (opModeInInit()) {
+            // TeamPropDetermination telemetry
             teamPropDeterminationProcessor.addTelemetry();
             telemetry.update();
         }
         waitForStart();
 
+        // Get determined team prop position
         TeamPropDetermination.Position teamPropPosition = teamPropDeterminationProcessor.getPosition();
 
         robot.start();

@@ -34,16 +34,17 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "RobotTele", group = "Robot")
-public class RobotTele extends LinearOpMode {
+@TeleOp(name = "TeleOpMode")
+public class TeleOpMode extends LinearOpMode {
+    // Constants
     final private double DRIVE_SMOOTHING = 2;
     final private double TURN_SMOOTHING = 2;
     final private double ARM_MAX_POWER = 0.3;
     final private double HAND_GAIN = 0.01;
 
+    // Gamepads to determine state changes.
     Gamepad currentGamepad1 = new Gamepad();
     Gamepad currentGamepad2 = new Gamepad();
-
     Gamepad previousGamepad1 = new Gamepad();
     Gamepad previousGamepad2 = new Gamepad();
 
@@ -59,19 +60,19 @@ public class RobotTele extends LinearOpMode {
         waitForStart();
         runtime.reset();
         while (opModeIsActive()) {
+            // Update gamepads
             previousGamepad1.copy(currentGamepad1);
             previousGamepad2.copy(currentGamepad2);
-
             currentGamepad1.copy(gamepad1);
             currentGamepad2.copy(gamepad2);
-
-
+            // Calculate drive and turn
             double drive = smooth(-gamepad1.left_stick_y, DRIVE_SMOOTHING);
             double turn = smooth(gamepad1.right_stick_x, TURN_SMOOTHING);
-
+            // Update motors power
             robot.driveRobot(drive, turn);
-
+            // Update arm power
             robot.setArmPower(gamepad2.left_stick_y * ARM_MAX_POWER);
+            // Toggle hand position from down to background using A button
             if (currentGamepad2.a && !previousGamepad2.a) {
                 Robot.HandState handState = robot.getHandState();
                 if (handState == Robot.HandState.BACKBOARD) {
@@ -80,18 +81,18 @@ public class RobotTele extends LinearOpMode {
                     robot.setHandState(Robot.HandState.BACKBOARD);
                 }
             }
-
+            // Toggle gripper position using X button
             if (currentGamepad2.x && !previousGamepad2.x) {
                 robot.setGripperState(!robot.gripperOpen);
             }
-
+            // Send telemetry
             robot.sendTelemetry();
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
     }
 
-
+    // TODO: determine helpfullness of this
     private double smooth(double x, double factor) {
         return Math.pow(Math.abs(x), factor) * Math.signum(x);
     }
