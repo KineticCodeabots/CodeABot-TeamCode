@@ -11,26 +11,34 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class AutoRobot extends Robot {
+    // Constants for motor encoder counts per revolution
     static final double COUNTS_PER_MOTOR_REV = 1120;
+    // Gear reduction applied to the motor's output
     static final double DRIVE_GEAR_REDUCTION = 1.0;
+    // Diameter of the wheels in inches
     static final double WHEEL_DIAMETER_INCHES = 4.0;
+    // Calculate the number of encoder counts per inch traveled
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * Math.PI);
+            (WHEEL_DIAMETER_INCHES * Math.PI); // Formula based on motor specs and wheel size
 
+    // Tolerated degrees to target heading
     static final double HEADING_THRESHOLD = 1.0;
-
+    // Proportional speed constant for turning in different situations
+    // TODO: tune maybe?
     static final double P_TURN_GAIN = 0.02;
     static final double P_DRIVE_GAIN = 0.03;
-
+    // Distance to accelerate and decelerate
     static final int ACCEL_DISTANCE_GAIN = (int) (10 * COUNTS_PER_INCH);
     static final int DECEL_DISTANCE_GAIN = (int) (20 * COUNTS_PER_INCH);
+    // Minimum speed when accelerating or decelerating
     static final double MIN_ACCEL_SPEED = 0.2;
     static final double MIN_DECEL_SPEED = 0.05;
-
+    // Global members for telemetry
     private double headingError = 0;
     private double targetHeading = 0;
     private int leftTarget = 0;
     private int rightTarget = 0;
+    // Interial Measurement Unit
     private IMU imu = null;
 
     public AutoRobot(LinearOpMode opMode) {
@@ -40,13 +48,13 @@ public class AutoRobot extends Robot {
     @Override
     public void init() {
         super.init();
+        // Override zero power behavior to brake
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        // Initialize IMU
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(orientationOnRobot));
     }
@@ -88,8 +96,10 @@ public class AutoRobot extends Robot {
         // keep looping while we are still active, and BOTH motors are running.
         while (opMode.opModeIsActive() &&
                 (leftDrive.isBusy() && rightDrive.isBusy())) {
+            // Determine current distance traveled
             int currentPosition = Math.max(Math.abs(leftDrive.getCurrentPosition() - leftStart), Math.abs(rightDrive.getCurrentPosition() - rightStart));
             double accelSpeed;
+            // Accelerate or decelerate based on distance to target
             if (currentPosition < accelDistance) {
                 accelSpeed = Math.max(((double) currentPosition / accelDistance) * maxDriveSpeed, MIN_ACCEL_SPEED);
             } else if (currentPosition > (targetPosition - decelDistance)) {
@@ -105,7 +115,7 @@ public class AutoRobot extends Robot {
             if (distance < 0)
                 turnSpeed *= -1.0;
 
-            // Apply the turning correction to the current driving speed.
+            // Chooes min value between accelSpeed and maxDriveSpeed for driving speed and apply the turning correction to the current driving speed.
             driveRobot(Math.min(accelSpeed, maxDriveSpeed), turnSpeed);
 
             // Display drive status for the driver.
@@ -161,14 +171,11 @@ public class AutoRobot extends Robot {
 
     public double getSteeringCorrection(double desiredHeading, double proportionalGain) {
         targetHeading = desiredHeading;  // Save for telemetry
-
         // Determine the heading current error
         headingError = targetHeading - getHeading();
-
         // Normalize the error to be within +/- 180 degrees
         while (headingError > 180) headingError -= 360;
         while (headingError <= -180) headingError += 360;
-
         // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
         return Range.clip(headingError * proportionalGain, -1, 1);
     }
