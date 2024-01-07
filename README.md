@@ -6,9 +6,10 @@
 
 **`opmodes`** Robot OpModes
 
-- `AutoBase.java`: This abstract class provides the base functionality for autonomous op modes.
+- `BaseAuto.java`: This abstract class provides the base functionality for autonomous op modes.
+- `Robot.java` Class representing the hardware of the robot
 - `AutoRobot.java`: This class extends the Robot class and provides specific functionality for autonomous operations, such as driving straight or turning to a specific heading.
-- `RobotTele.java`: This is the tele opmode
+- `TeleOpMode.java`: This is the tele opmode
 
 **`opmodes.autos`**
 Auto OpModes for different starting states.
