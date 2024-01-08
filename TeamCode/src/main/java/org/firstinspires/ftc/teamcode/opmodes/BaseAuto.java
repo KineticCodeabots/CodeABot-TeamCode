@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.CodeabotCommon;
@@ -19,18 +20,18 @@ public abstract class BaseAuto extends LinearOpMode {
     private final CodeabotCommon.StartingLocation startingLocation = CodeabotCommon.StartingLocation.AUDIENCE;
 
     final private AutoRobot robot = new AutoRobot(this);
-    // TODO: add runtime maybe?
 
     @Override
     public void runOpMode() {
         robot.init();
+        // TODO: move this to AutoRobot
         // Initialize VisionPortal and TeamPropDetermination
         TeamPropDetermination teamPropDeterminationProcessor = new TeamPropDetermination(telemetry, alliance);
 
         VisionPortal.Builder visionPortalBuilder = new VisionPortal.Builder();
         visionPortalBuilder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                 .addProcessor(teamPropDeterminationProcessor)
-                .setCameraResolution(new Size(640, 480))
+                .setCameraResolution(new Size(640, 480)) // TODO: determine ideal resolution
                 .enableLiveView(true)
                 .setAutoStopLiveView(true)
                 .build();
@@ -43,6 +44,7 @@ public abstract class BaseAuto extends LinearOpMode {
             teamPropDeterminationProcessor.addTelemetry();
             telemetry.update();
         }
+        if (!opModeIsActive()) return; // I think I need this /shrug
         waitForStart();
 
         // Get determined team prop position
