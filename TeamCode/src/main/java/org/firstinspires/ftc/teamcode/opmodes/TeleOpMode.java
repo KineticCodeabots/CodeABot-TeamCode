@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class TeleOpMode extends LinearOpMode {
     // Constants
     final private double DRIVE_SMOOTHING = 2;
-    final private double TURN_SMOOTHING = 2;
+    final private double MAX_TURN = 0.5;
     final private double ARM_MAX_POWER = 0.3;
 
     // Gamepads to determine state changes.
@@ -65,8 +65,8 @@ public class TeleOpMode extends LinearOpMode {
             currentGamepad1.copy(gamepad1);
             currentGamepad2.copy(gamepad2);
             // Calculate drive and turn
-            double drive = smooth(-gamepad1.left_stick_y, DRIVE_SMOOTHING);
-            double turn = smooth(gamepad1.right_stick_x, TURN_SMOOTHING);
+            double drive = -gamepad1.left_stick_y;
+            double turn = gamepad1.right_stick_x * 0.5;
             // Update motors power
             robot.driveRobot(drive, turn);
             // Update arm power
