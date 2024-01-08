@@ -40,7 +40,6 @@ public class TeleOpMode extends LinearOpMode {
     final private double DRIVE_SMOOTHING = 2;
     final private double TURN_SMOOTHING = 2;
     final private double ARM_MAX_POWER = 0.3;
-    final private double HAND_GAIN = 0.01;
 
     // Gamepads to determine state changes.
     Gamepad currentGamepad1 = new Gamepad();

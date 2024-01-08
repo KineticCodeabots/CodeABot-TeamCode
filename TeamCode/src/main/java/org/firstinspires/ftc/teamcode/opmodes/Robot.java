@@ -130,7 +130,6 @@ public class Robot {
     void setArmPower(double power) {
         armMotor.setPower(power);
     }
-
     /**
      * Enum for the state of the hand servo
      */
