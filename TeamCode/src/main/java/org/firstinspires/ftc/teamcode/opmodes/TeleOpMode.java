@@ -40,6 +40,8 @@ public class TeleOpMode extends LinearOpMode {
     final private double DRIVE_SMOOTHING = 2;
     final private double MAX_TURN = 0.5;
     final private double ARM_MAX_POWER = 0.3;
+    final private double MAX_CRAWL_SPEED = 0.3;
+    final private double MAX_PRECISE_SPEED = 0.2;
 
     // Gamepads to determine state changes.
     Gamepad currentGamepad1 = new Gamepad();
@@ -49,6 +51,9 @@ public class TeleOpMode extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Robot robot = new Robot(this);
+
+    private boolean crawlingMode = false;
+    private boolean preciseMode = false;
 
     @Override
     public void runOpMode() {
@@ -64,9 +69,21 @@ public class TeleOpMode extends LinearOpMode {
             previousGamepad2.copy(currentGamepad2);
             currentGamepad1.copy(gamepad1);
             currentGamepad2.copy(gamepad2);
+
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
+                crawlingMode = !crawlingMode;
+            preciseMode = currentGamepad1.right_bumper;
+
             // Calculate drive and turn
             double drive = -gamepad1.left_stick_y;
             double turn = gamepad1.right_stick_x * 0.5;
+
+            if (crawlingMode) {
+                drive = Math.min(drive, MAX_CRAWL_SPEED);
+                turn = Math.min(turn, MAX_CRAWL_SPEED);
+            }
+            if (preciseMode) turn = Math.min(turn, MAX_PRECISE_SPEED);
+
             // Update motors power
             robot.driveRobot(drive, turn);
             // Update arm power
@@ -85,8 +102,16 @@ public class TeleOpMode extends LinearOpMode {
                 robot.setGripperState(!robot.gripperOpen);
             }
             // Send telemetry
-            robot.sendTelemetry();
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addLine("Driver (Gamepad 1):");
+            telemetry.addData("Drive (Left Stick)", "left (%.2f), right (%.2f)", robot.leftSpeed, robot.rightSpeed);
+            telemetry.addData("Crawling (Left Bumber): Precise (Right Bumber)", "%b : %b", crawlingMode, preciseMode);
+
+            telemetry.addLine("\nOperator (Gamepad 2):");
+            telemetry.addData("Arm (Left Stick)", "power (%.2f)", robot.armMotor.getPower());
+            telemetry.addData("Hand (A)", "position (%.2f), state (%s)", robot.handPosition, robot.getHandState());
+            telemetry.addData("Gripper (X)", "position (%.2f), open (%b)", robot.gripperPosition, robot.gripperOpen);
+
+            telemetry.addData("\nStatus", "Run Time: " + runtime.toString());
             telemetry.update();
         }
     }

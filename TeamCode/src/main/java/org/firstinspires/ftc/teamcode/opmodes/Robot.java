@@ -16,7 +16,7 @@ public class Robot {
     public double leftSpeed = 0;
     public double rightSpeed = 0;
 
-    private DcMotor armMotor = null;
+    public DcMotor armMotor = null;
     // Servos
     public Servo handServo = null;
     public double handPosition = 0;
@@ -73,8 +73,9 @@ public class Robot {
 
     /**
      * Drive the robot with the given drive and turn speeds
+     *
      * @param drive The speed to drive the robot forward/backward
-     * @param turn The speed to turn the robot left/right
+     * @param turn  The speed to turn the robot left/right
      */
     public void driveRobot(double drive, double turn) {
         driveSpeed = drive;
@@ -95,6 +96,7 @@ public class Robot {
 
     /**
      * Set the power of the drive motors
+     *
      * @param left
      * @param right
      */
@@ -108,7 +110,7 @@ public class Robot {
     /**
      * Does not call telemetry.update().
      */
-    public void sendTelemetry() {
+    public void addTelemetry() {
         telemetry.addData("Drive", "left (%.2f), right (%.2f)", leftSpeed, rightSpeed);
         telemetry.addData("Arm", "power (%.2f)", armMotor.getPower());
         telemetry.addData("Hand", "position (%.2f), state (%s)", handPosition, getHandState());
@@ -125,11 +127,13 @@ public class Robot {
 
     /**
      * Set the power of the arm motor
+     *
      * @param power The power to set the arm motor to
      */
     void setArmPower(double power) {
         armMotor.setPower(power);
     }
+
     /**
      * Enum for the state of the hand servo
      */
@@ -141,6 +145,7 @@ public class Robot {
 
     /**
      * Set the position of the hand servo
+     *
      * @param state The state to set the hand servo to
      */
     void setHandState(HandState state) {
@@ -159,6 +164,7 @@ public class Robot {
 
     /**
      * Get the state of the hand servo
+     *
      * @return The state of the hand servo
      */
     public HandState getHandState() {
@@ -173,6 +179,7 @@ public class Robot {
 
     /**
      * Set the position of the hand servo
+     *
      * @param position The position to set the hand servo to
      */
     void setHandPosition(double position) {
@@ -182,6 +189,7 @@ public class Robot {
 
     /**
      * Set the state of the gripper servo
+     *
      * @param open Whether the gripper is opened or closed
      */
     void setGripperState(boolean open) {
@@ -196,6 +204,7 @@ public class Robot {
 
     /**
      * Set the position of the gripper servo
+     *
      * @param position The position to set the gripper servo to
      */
     void setGripperPosition(double position) {
