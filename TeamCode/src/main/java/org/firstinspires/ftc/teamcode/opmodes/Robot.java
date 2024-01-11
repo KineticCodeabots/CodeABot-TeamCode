@@ -17,6 +17,8 @@ public class Robot {
     public double rightSpeed = 0;
 
     public DcMotor armMotor = null;
+    private int armStopPosition = 0;
+    private boolean armStopped = false;
     // Servos
     public Servo handServo = null;
     public double handPosition = 0;
@@ -57,8 +59,9 @@ public class Robot {
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // Initialize arm
         armMotor = hardwareMap.get(DcMotor.class, "arm");
+        armMotor.setDirection(DcMotor.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Initialize servos
         handServo = hardwareMap.get(Servo.class, "hand");
@@ -134,12 +137,27 @@ public class Robot {
         armMotor.setPower(power);
     }
 
+    void setArmPowerAndHold(double power, int holdP) {
+        if (power != 0) {
+            armStopped = false;
+            armMotor.setPower(power);
+        } else {
+            if (!armStopped) {
+                armStopped = true;
+                armStopPosition = armMotor.getCurrentPosition();
+            }
+            double holdPower = Math.min((double) (armStopPosition - armMotor.getCurrentPosition()) / holdP, 0.3);
+            if (holdPower < 0.1) holdPower = 0;
+            armMotor.setPower(holdPower);
+        }
+    }
+
     /**
      * Enum for the state of the hand servo
      */
     public enum HandState {
         DOWN,
-        BACKBOARD,
+        BACKDROP,
         UP
     }
 
@@ -153,11 +171,11 @@ public class Robot {
             case DOWN:
                 setHandPosition(0);
                 break;
-            case BACKBOARD:
-                setHandPosition(0.5);
+            case BACKDROP:
+                setHandPosition(0.3);
                 break;
             case UP:
-                setHandPosition(1);
+                setHandPosition(0.8);
                 break;
         }
     }
@@ -170,9 +188,9 @@ public class Robot {
     public HandState getHandState() {
         if (handPosition == 0) {
             return HandState.DOWN;
-        } else if (handPosition == 0.5) {
-            return HandState.BACKBOARD;
-        } else if (handPosition == 1) {
+        } else if (handPosition == 0.3) {
+            return HandState.BACKDROP;
+        } else if (handPosition == 0.8) {
             return HandState.UP;
         } else return null;
     }
@@ -195,7 +213,7 @@ public class Robot {
     void setGripperState(boolean open) {
         gripperOpen = open;
         if (open) {
-            gripperPosition = 0.5;
+            gripperPosition = 0.3;
         } else {
             gripperPosition = 0;
         }
