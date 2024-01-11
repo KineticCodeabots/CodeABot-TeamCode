@@ -33,13 +33,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "TeleOpMode")
 public class TeleOpMode extends LinearOpMode {
     // Constants
     final private double DRIVE_SMOOTHING = 2;
     final private double MAX_TURN = 0.5;
-    final private double ARM_MAX_POWER = 0.3;
+    final private double ARM_MAX_POWER = 0.4;
+    final private double ARM_DOWN_MAX_POWER = 0.1;
     final private double MAX_CRAWL_SPEED = 0.3;
     final private double MAX_PRECISE_SPEED = 0.2;
 
@@ -87,15 +89,23 @@ public class TeleOpMode extends LinearOpMode {
             // Update motors power
             robot.driveRobot(drive, turn);
             // Update arm power
-            robot.setArmPower(gamepad2.left_stick_y * ARM_MAX_POWER);
-            // Toggle hand position from down to background using A button
+            double armPower = -gamepad2.left_stick_y;
+            if (armPower > 0) armPower *= ARM_MAX_POWER;
+            else armPower *= ARM_DOWN_MAX_POWER;
+            robot.setArmPowerAndHold(armPower, 300);
+
+            if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+                robot.setHandPosition(Range.clip(robot.handPosition + 0.05, 0, 1));
+            } else if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+                robot.setHandPosition(Range.clip(robot.handPosition - 0.05, 0, 1));
+            }
+            // Change hand position using A, B, and Y buttons
             if (currentGamepad2.a && !previousGamepad2.a) {
-                Robot.HandState handState = robot.getHandState();
-                if (handState == Robot.HandState.BACKBOARD) {
-                    robot.setHandState(Robot.HandState.DOWN);
-                } else {
-                    robot.setHandState(Robot.HandState.BACKBOARD);
-                }
+                robot.setHandState(Robot.HandState.DOWN);
+            } else if (currentGamepad2.b && !previousGamepad2.b) {
+                robot.setHandState(Robot.HandState.BACKDROP);
+            } else if (currentGamepad2.y && !previousGamepad2.y) {
+                robot.setHandState(Robot.HandState.UP);
             }
             // Toggle gripper position using X button
             if (currentGamepad2.x && !previousGamepad2.x) {
@@ -107,11 +117,11 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addData("Crawling (Left Bumber): Precise (Right Bumber)", "%b : %b", crawlingMode, preciseMode);
 
             telemetry.addLine("\nOperator (Gamepad 2):");
-            telemetry.addData("Arm (Left Stick)", "power (%.2f)", robot.armMotor.getPower());
+            telemetry.addData("Arm (Left Stick)", "power (%.2f), position (%d)", robot.armMotor.getPower(), robot.armMotor.getCurrentPosition());
             telemetry.addData("Hand (A)", "position (%.2f), state (%s)", robot.handPosition, robot.getHandState());
             telemetry.addData("Gripper (X)", "position (%.2f), open (%b)", robot.gripperPosition, robot.gripperOpen);
 
-            telemetry.addData("\nStatus", "Run Time: " + runtime.toString());
+            telemetry.addData("\nStatus", "Run Time: %.2f", runtime.seconds());
             telemetry.update();
         }
     }
