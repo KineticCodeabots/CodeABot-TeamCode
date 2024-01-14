@@ -137,14 +137,15 @@ public class Robot {
         armMotor.setPower(power);
     }
 
-    void setArmPowerAndHold(double power, int holdP) {
-        if (power != 0) {
+    void setArmPowerOrHold(double power, int holdP, boolean virtualHardStop) {
+        if (power != 0 && (!virtualHardStop || armMotor.getCurrentPosition() > 100)) {
             armStopped = false;
             armMotor.setPower(power);
         } else {
             if (!armStopped) {
                 armStopped = true;
                 armStopPosition = armMotor.getCurrentPosition();
+                if (virtualHardStop) armStopPosition = Math.max(armStopPosition, 100);
             }
             double holdPower = Math.min((double) (armStopPosition - armMotor.getCurrentPosition()) / holdP, 0.3);
             if (holdPower < 0.1) holdPower = 0;
