@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -72,45 +73,9 @@ public class TeleOpMode extends LinearOpMode {
             currentGamepad1.copy(gamepad1);
             currentGamepad2.copy(gamepad2);
 
-            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
-                crawlingMode = !crawlingMode;
-            preciseMode = currentGamepad1.right_bumper;
+            updateDrive();
+            updateArm();
 
-            // Calculate drive and turn
-            double drive = -gamepad1.left_stick_y;
-            double turn = gamepad1.right_stick_x * 0.5;
-
-            if (crawlingMode) {
-                drive = Math.min(drive, MAX_CRAWL_SPEED);
-                turn = Math.min(turn, MAX_CRAWL_SPEED);
-            }
-            if (preciseMode) turn = Math.min(turn, MAX_PRECISE_SPEED);
-
-            // Update motors power
-            robot.driveRobot(drive, turn);
-            // Update arm power
-            double armPower = -gamepad2.left_stick_y;
-            if (armPower > 0) armPower *= ARM_MAX_POWER;
-            else armPower *= ARM_DOWN_MAX_POWER;
-            robot.setArmPowerAndHold(armPower, 300);
-
-            if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
-                robot.setHandPosition(Range.clip(robot.handPosition + 0.05, 0, 1));
-            } else if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
-                robot.setHandPosition(Range.clip(robot.handPosition - 0.05, 0, 1));
-            }
-            // Change hand position using A, B, and Y buttons
-            if (currentGamepad2.a && !previousGamepad2.a) {
-                robot.setHandState(Robot.HandState.DOWN);
-            } else if (currentGamepad2.b && !previousGamepad2.b) {
-                robot.setHandState(Robot.HandState.BACKDROP);
-            } else if (currentGamepad2.y && !previousGamepad2.y) {
-                robot.setHandState(Robot.HandState.UP);
-            }
-            // Toggle gripper position using X button
-            if (currentGamepad2.x && !previousGamepad2.x) {
-                robot.setGripperState(!robot.gripperOpen);
-            }
             // Send telemetry
             telemetry.addLine("Driver (Gamepad 1):");
             telemetry.addData("Drive (Left Stick)", "left (%.2f), right (%.2f)", robot.leftSpeed, robot.rightSpeed);
@@ -123,6 +88,67 @@ public class TeleOpMode extends LinearOpMode {
 
             telemetry.addData("\nStatus", "Run Time: %.2f", runtime.seconds());
             telemetry.update();
+        }
+    }
+
+    void updateDrive() {
+        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper)
+            crawlingMode = !crawlingMode;
+        preciseMode = currentGamepad1.right_bumper;
+
+        // Calculate drive and turn
+        double driveInput = -gamepad1.left_stick_y;
+        double turnInput = gamepad1.right_stick_x;
+        double drive = driveInput;
+        double turn = turnInput;
+
+        if (crawlingMode) {
+            drive = driveInput * MAX_CRAWL_SPEED;
+            turn = turnInput * MAX_CRAWL_SPEED;
+        }
+        if (preciseMode) {
+            drive = driveInput * MAX_PRECISE_SPEED;
+            turn = turnInput * MAX_PRECISE_SPEED;
+        }
+
+        // Update motors power
+        robot.driveRobot(drive, turn);
+    }
+
+    void updateArm() {
+        // Update arm power
+        if (currentGamepad2.left_trigger != 0) {
+            if (robot.armMotor.getCurrentPosition() > 5)
+                robot.setArmPower(-currentGamepad2.left_trigger * ARM_DOWN_MAX_POWER);
+            else robot.setArmPower(0);
+        } else {
+            double armPower = -gamepad2.left_stick_y;
+            if (armPower > 0) armPower *= ARM_MAX_POWER;
+            else armPower *= ARM_DOWN_MAX_POWER;
+            robot.setArmPowerOrHold(armPower, 300, !currentGamepad2.left_bumper);
+        }
+
+        // Reset arm encoder
+        if (previousGamepad2.left_bumper && !currentGamepad2.left_bumper) {
+            robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+
+        if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+            robot.setHandPosition(Range.clip(robot.handPosition + 0.05, 0, 1));
+        } else if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+            robot.setHandPosition(Range.clip(robot.handPosition - 0.05, 0, 1));
+        }
+        // Change hand position using A, B, and Y buttons
+        if (currentGamepad2.a && !previousGamepad2.a) {
+            robot.setHandState(Robot.HandState.DOWN);
+        } else if (currentGamepad2.b && !previousGamepad2.b) {
+            robot.setHandState(Robot.HandState.BACKDROP);
+        } else if (currentGamepad2.y && !previousGamepad2.y) {
+            robot.setHandState(Robot.HandState.UP);
+        }
+        // Toggle gripper position using X button
+        if (currentGamepad2.x && !previousGamepad2.x) {
+            robot.setGripperState(!robot.gripperOpen);
         }
     }
 
