@@ -138,6 +138,13 @@ public class Robot {
         armMotor.setPower(power);
     }
 
+    /**
+     * Set the power of the arm motor or hold the arm at a position
+     *
+     * @param power           The power to set the arm motor to
+     * @param holdP           The proportional value to hold the arm at
+     * @param virtualHardStop Whether to stop the arm at the virtual hard stop
+     */
     void setArmPowerOrHold(double power, int holdP, boolean virtualHardStop) {
         if (virtualHardStop && armMotor.getCurrentPosition() <= ARM_VIRTUAL_STOP) {
             holdArm(ARM_VIRTUAL_STOP, holdP);
