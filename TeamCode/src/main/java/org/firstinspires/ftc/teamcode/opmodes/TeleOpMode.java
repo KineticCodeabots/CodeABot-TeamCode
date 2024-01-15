@@ -44,7 +44,7 @@ public class TeleOpMode extends LinearOpMode {
     final private double ARM_MAX_POWER = 0.4;
     final private double ARM_DOWN_MAX_POWER = 0.1;
     final private double MAX_CRAWL_SPEED = 0.3;
-    final private double MAX_PRECISE_SPEED = 0.2;
+    final private double MAX_PRECISE_SPEED = 0.15;
 
     // Gamepads to determine state changes.
     Gamepad currentGamepad1 = new Gamepad();
@@ -82,6 +82,7 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addData("Crawling (Left Bumber): Precise (Right Bumber)", "%b : %b", crawlingMode, preciseMode);
 
             telemetry.addLine("\nOperator (Gamepad 2):");
+            // TODO: arm hold telemetry
             telemetry.addData("Arm (Left Stick)", "power (%.2f), position (%d)", robot.armMotor.getPower(), robot.armMotor.getCurrentPosition());
             telemetry.addData("Hand (A)", "position (%.2f), state (%s)", robot.handPosition, robot.getHandState());
             telemetry.addData("Gripper (X)", "position (%.2f), open (%b)", robot.gripperPosition, robot.gripperOpen);
@@ -97,7 +98,7 @@ public class TeleOpMode extends LinearOpMode {
         preciseMode = currentGamepad1.right_bumper;
 
         // Calculate drive and turn
-        double driveInput = -gamepad1.left_stick_y;
+        double driveInput = gamepad1.left_stick_y;
         double turnInput = gamepad1.right_stick_x;
         double drive = driveInput;
         double turn = turnInput;
@@ -118,19 +119,20 @@ public class TeleOpMode extends LinearOpMode {
     void updateArm() {
         // Update arm power
         if (currentGamepad2.left_trigger != 0) {
-            if (robot.armMotor.getCurrentPosition() > 5)
+            if (robot.armMotor.getCurrentPosition() > 2)
                 robot.setArmPower(-currentGamepad2.left_trigger * ARM_DOWN_MAX_POWER);
             else robot.setArmPower(0);
         } else {
             double armPower = -gamepad2.left_stick_y;
             if (armPower > 0) armPower *= ARM_MAX_POWER;
             else armPower *= ARM_DOWN_MAX_POWER;
-            robot.setArmPowerOrHold(armPower, 300, !currentGamepad2.left_bumper);
+            robot.setArmPowerOrHold(armPower, 300, !currentGamepad2.left_bumper, 100);
         }
 
         // Reset arm encoder
         if (previousGamepad2.left_bumper && !currentGamepad2.left_bumper) {
             robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
         if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {

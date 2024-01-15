@@ -19,7 +19,7 @@ public class Robot {
     public DcMotor armMotor = null;
     private int armStopPosition = 0;
     private boolean armStopped = false;
-    final private int ARM_VIRTUAL_STOP = 100;
+    final private int ARM_VIRTUAL_STOP = 110;
     // Servos
     public Servo handServo = null;
     public double handPosition = 0;
@@ -56,8 +56,8 @@ public class Robot {
         // Reset encoders
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Initialize arm
         armMotor = hardwareMap.get(DcMotor.class, "arm");
         armMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -135,6 +135,7 @@ public class Robot {
      * @param power The power to set the arm motor to
      */
     void setArmPower(double power) {
+        if (power != 0) armStopped = false;
         armMotor.setPower(power);
     }
 
@@ -145,9 +146,10 @@ public class Robot {
      * @param holdP           The proportional value to hold the arm at
      * @param virtualHardStop Whether to stop the arm at the virtual hard stop
      */
-    void setArmPowerOrHold(double power, int holdP, boolean virtualHardStop) {
-        if (virtualHardStop && armMotor.getCurrentPosition() <= ARM_VIRTUAL_STOP) {
-            holdArm(ARM_VIRTUAL_STOP, holdP);
+    void setArmPowerOrHold(double power, int holdP, boolean virtualHardStop, int virtualHardStopP) {
+        if (virtualHardStop && armMotor.getCurrentPosition() < ARM_VIRTUAL_STOP + 5 && power <= 0) {
+            armStopped = false;
+            holdArm(ARM_VIRTUAL_STOP, virtualHardStopP);
         } else {
             if (power != 0) {
                 armStopped = false;
@@ -163,9 +165,10 @@ public class Robot {
     }
 
     void holdArm(int holdPosition, int holdP) {
-        double holdPower = Math.min((double) (holdPosition - armMotor.getCurrentPosition()) / holdP, 0.3);
-        if (holdPower < 0.1) holdPower = 0;
-        armMotor.setPower(holdPower);
+        if (armMotor.getCurrentPosition() < holdPosition) {
+            double holdPower = Math.min((double) (holdPosition - armMotor.getCurrentPosition()) / holdP, 0.3);
+            armMotor.setPower(Math.max(holdPower, 0.12));
+        } else armMotor.setPower(0);
     }
 
     /**
@@ -188,7 +191,7 @@ public class Robot {
                 setHandPosition(0);
                 break;
             case BACKDROP:
-                setHandPosition(0.3);
+                setHandPosition(0.25);
                 break;
             case UP:
                 setHandPosition(0.8);
@@ -204,7 +207,7 @@ public class Robot {
     public HandState getHandState() {
         if (handPosition == 0) {
             return HandState.DOWN;
-        } else if (handPosition == 0.3) {
+        } else if (handPosition == 0.25) {
             return HandState.BACKDROP;
         } else if (handPosition == 0.8) {
             return HandState.UP;
@@ -229,7 +232,7 @@ public class Robot {
     void setGripperState(boolean open) {
         gripperOpen = open;
         if (open) {
-            gripperPosition = 0.3;
+            gripperPosition = 0.28;
         } else {
             gripperPosition = 0;
         }
