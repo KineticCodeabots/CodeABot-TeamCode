@@ -19,6 +19,7 @@ public class Robot {
     public DcMotor armMotor = null;
     private int armStopPosition = 0;
     private boolean armStopped = false;
+    final private int ARM_VIRTUAL_STOP = 100;
     // Servos
     public Servo handServo = null;
     public double handPosition = 0;
@@ -138,19 +139,26 @@ public class Robot {
     }
 
     void setArmPowerOrHold(double power, int holdP, boolean virtualHardStop) {
-        if (power != 0 && (!virtualHardStop || armMotor.getCurrentPosition() > 100)) {
-            armStopped = false;
-            armMotor.setPower(power);
+        if (virtualHardStop && armMotor.getCurrentPosition() <= ARM_VIRTUAL_STOP) {
+            holdArm(ARM_VIRTUAL_STOP, holdP);
         } else {
-            if (!armStopped) {
-                armStopped = true;
-                armStopPosition = armMotor.getCurrentPosition();
-                if (virtualHardStop) armStopPosition = Math.max(armStopPosition, 100);
+            if (power != 0) {
+                armStopped = false;
+                armMotor.setPower(power);
+            } else {
+                if (!armStopped) {
+                    armStopped = true;
+                    armStopPosition = armMotor.getCurrentPosition();
+                }
+                holdArm(armStopPosition, holdP);
             }
-            double holdPower = Math.min((double) (armStopPosition - armMotor.getCurrentPosition()) / holdP, 0.3);
-            if (holdPower < 0.1) holdPower = 0;
-            armMotor.setPower(holdPower);
         }
+    }
+
+    void holdArm(int holdPosition, int holdP) {
+        double holdPower = Math.min((double) (holdPosition - armMotor.getCurrentPosition()) / holdP, 0.3);
+        if (holdPower < 0.1) holdPower = 0;
+        armMotor.setPower(holdPower);
     }
 
     /**
