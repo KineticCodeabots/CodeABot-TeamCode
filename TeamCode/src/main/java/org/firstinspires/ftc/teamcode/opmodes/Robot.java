@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -16,10 +17,8 @@ public class Robot {
     public double leftSpeed = 0;
     public double rightSpeed = 0;
 
-    public DcMotor armMotor = null;
-    private int armStopPosition = 0;
-    private boolean armStopped = false;
-    final private int ARM_VIRTUAL_STOP = 110;
+    public DcMotorEx armMotor = null;
+    public ArmController arm = null;
     // Servos
     public Servo handServo = null;
     public double handPosition = 0;
@@ -59,11 +58,10 @@ public class Robot {
         leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Initialize arm
-        armMotor = hardwareMap.get(DcMotor.class, "arm");
-        armMotor.setDirection(DcMotor.Direction.REVERSE);
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armMotor = hardwareMap.get(DcMotorEx.class, "arm");
+        arm = new ArmController(armMotor);
+        arm.init();
+
         // Initialize servos
         handServo = hardwareMap.get(Servo.class, "hand");
         handServo.setDirection(Servo.Direction.REVERSE);
@@ -129,47 +127,6 @@ public class Robot {
         setGripperState(true);
     }
 
-    /**
-     * Set the power of the arm motor
-     *
-     * @param power The power to set the arm motor to
-     */
-    void setArmPower(double power) {
-        if (power != 0) armStopped = false;
-        armMotor.setPower(power);
-    }
-
-    /**
-     * Set the power of the arm motor or hold the arm at a position
-     *
-     * @param power           The power to set the arm motor to
-     * @param holdP           The proportional value to hold the arm at
-     * @param virtualHardStop Whether to stop the arm at the virtual hard stop
-     */
-    void setArmPowerOrHold(double power, int holdP, boolean virtualHardStop, int virtualHardStopP) {
-        if (virtualHardStop && armMotor.getCurrentPosition() < ARM_VIRTUAL_STOP + 5 && power <= 0) {
-            armStopped = false;
-            holdArm(ARM_VIRTUAL_STOP, virtualHardStopP);
-        } else {
-            if (power != 0) {
-                armStopped = false;
-                armMotor.setPower(power);
-            } else {
-                if (!armStopped) {
-                    armStopped = true;
-                    armStopPosition = armMotor.getCurrentPosition();
-                }
-                holdArm(armStopPosition, holdP);
-            }
-        }
-    }
-
-    void holdArm(int holdPosition, int holdP) {
-        if (armMotor.getCurrentPosition() < holdPosition) {
-            double holdPower = Math.min((double) (holdPosition - armMotor.getCurrentPosition()) / holdP, 0.3);
-            armMotor.setPower(Math.max(holdPower, 0.12));
-        } else armMotor.setPower(0);
-    }
 
     /**
      * Enum for the state of the hand servo
@@ -188,7 +145,7 @@ public class Robot {
     void setHandState(HandState state) {
         switch (state) {
             case DOWN:
-                setHandPosition(0);
+                setHandPosition(0.05);
                 break;
             case BACKDROP:
                 setHandPosition(0.25);
@@ -205,7 +162,7 @@ public class Robot {
      * @return The state of the hand servo
      */
     public HandState getHandState() {
-        if (handPosition == 0) {
+        if (handPosition == 0.05) {
             return HandState.DOWN;
         } else if (handPosition == 0.25) {
             return HandState.BACKDROP;
