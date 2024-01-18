@@ -83,7 +83,7 @@ public class TeleOpMode extends LinearOpMode {
 
             telemetry.addLine("\nOperator (Gamepad 2):");
             // TODO: arm hold telemetry
-            telemetry.addData("Arm (Left Stick)", "power (%.2f), position (%d)", robot.armMotor.getPower(), robot.armMotor.getCurrentPosition());
+            telemetry.addData("Arm (Left Stick)", "power (%.2f), position (%d), velocity (%.2f)", robot.armMotor.getPower(), robot.armMotor.getCurrentPosition(), robot.armMotor.getVelocity());
             telemetry.addData("Hand (A)", "position (%.2f), state (%s)", robot.handPosition, robot.getHandState());
             telemetry.addData("Gripper (X)", "position (%.2f), open (%b)", robot.gripperPosition, robot.gripperOpen);
 
@@ -118,22 +118,10 @@ public class TeleOpMode extends LinearOpMode {
 
     void updateArm() {
         // Update arm power
-        if (currentGamepad2.left_trigger != 0) {
-            if (robot.armMotor.getCurrentPosition() > 2)
-                robot.setArmPower(-currentGamepad2.left_trigger * ARM_DOWN_MAX_POWER);
-            else robot.setArmPower(0);
-        } else {
-            double armPower = -gamepad2.left_stick_y;
-            if (armPower > 0) armPower *= ARM_MAX_POWER;
-            else armPower *= ARM_DOWN_MAX_POWER;
-            robot.setArmPowerOrHold(armPower, 300, !currentGamepad2.left_bumper, 100);
-        }
-
-        // Reset arm encoder
-        if (previousGamepad2.left_bumper && !currentGamepad2.left_bumper) {
-            robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
+        robot.arm.update(
+                -currentGamepad2.left_stick_y,
+                currentGamepad2.left_bumper,
+                currentGamepad2.right_bumper);
 
         if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
             robot.setHandPosition(Range.clip(robot.handPosition + 0.05, 0, 1));
