@@ -124,9 +124,9 @@ public class TeleOpMode extends LinearOpMode {
                 currentGamepad2.right_bumper);
 
         if (currentGamepad2.dpad_up) {
-            robot.setHandPosition(Range.clip(robot.handPosition + 0.001, 0, 1));
+            robot.setHandPosition(Range.clip(robot.handPosition + 0.003, 0, 1));
         } else if (currentGamepad2.dpad_down) {
-            robot.setHandPosition(Range.clip(robot.handPosition - 0.001, 0, 1));
+            robot.setHandPosition(Range.clip(robot.handPosition - 0.003, 0, 1));
         }
         // Change hand position using A, B, and Y buttons
         if (currentGamepad2.a && !previousGamepad2.a) {

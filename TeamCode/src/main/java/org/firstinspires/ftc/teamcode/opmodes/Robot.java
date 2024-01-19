@@ -145,7 +145,7 @@ public class Robot {
     void setHandState(HandState state) {
         switch (state) {
             case DOWN:
-                setHandPosition(0.05);
+                setHandPosition(0.04);
                 break;
             case BACKDROP:
                 setHandPosition(0.25);
@@ -162,7 +162,7 @@ public class Robot {
      * @return The state of the hand servo
      */
     public HandState getHandState() {
-        if (handPosition == 0.05) {
+        if (handPosition <= 0.05) {
             return HandState.DOWN;
         } else if (handPosition == 0.25) {
             return HandState.BACKDROP;
