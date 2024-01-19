@@ -1,11 +1,8 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.utils;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.teamcode.opmodes.utils.PID;
-import org.firstinspires.ftc.teamcode.opmodes.utils.PIDF;
 
 public class ArmController {
     private DcMotorEx motor = null;
