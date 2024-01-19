@@ -8,13 +8,17 @@ and `StartingLocation` (AUDIENCE, BACKSTAGE).
 **`opmodes`** Robot OpModes
 
 - `BaseAuto.java`: This abstract class provides the base functionality for autonomous op modes.
-- `Robot.java` Class representing the hardware of the robot
+- `Robot.java`L Class representing the hardware of the robot
 - `AutoRobot.java`: This class extends the Robot class and provides specific functionality for
   autonomous operations, such as driving straight or turning to a specific heading.
 - `TeleOpMode.java`: This is the tele opmode
 
 **`opmodes.autos`**
 Auto OpModes for different starting states.
+
+**`opmodes.utils`** Utility classes.
+
+- `ArmController.java`: This class is used to control the arm.
 
 **`vision`** Vision processing
 
