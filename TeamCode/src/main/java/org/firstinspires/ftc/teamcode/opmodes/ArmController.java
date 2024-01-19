@@ -9,15 +9,15 @@ import org.firstinspires.ftc.teamcode.PIDF;
 
 public class ArmController {
     private DcMotorEx motor = null;
-    private final int MAX_VELOCITY = 600;
+    private final int TARGET_VELOCITY = 600;
     private final double MAX_POWER = 0.3; // For safety reasons
-    private final int VIRTUAL_STOP_POSITION = 105;
+    private final int VIRTUAL_STOP_POSITION = 90;
     private final int VIRTUAL_STOP_THRESSHOLD = 10;
-    private final int VIRTUAL_STOP_SLOWDOWN = 50;
-    private final int VIRTUAL_STOP_SLOWDOWN_VELOCITY = 300;
+    private final int VIRTUAL_STOP_SLOWDOWN = 100;
+    private final int VIRTUAL_STOP_SLOWDOWN_VELOCITY = 250;
 
-    private final PIDF velocityPID = new PIDF(0.0005, 0.0000, 0.0005, 0.0005);
-    private final PID positionPID = new PID(0.05, 0.001, 0);
+    private final PIDF velocityPIDF = new PIDF(0.0005, 0.0000, 0.000, 0.00045);
+    private final PID positionPID = new PID(0.05, 0.002, 0);
 
     private int previousPosition = 0;
     private boolean previousZeroing = false;
@@ -35,24 +35,26 @@ public class ArmController {
 
     public void update(double power, boolean pushDown, boolean zeroing) {
         if (motor.getCurrentPosition() > VIRTUAL_STOP_POSITION + VIRTUAL_STOP_THRESSHOLD || power > 0 || zeroing || pushDown) {
-            if (power == 0 && !pushDown)
-                motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            else motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-            if (power == 0) velocityPID.reset();
-
-            if (pushDown && power == 0) {
-                if (motor.getCurrentPosition() > 20) setPower(-0.1);
-                else setPower(0);
+            boolean inSlowdown = motor.getCurrentPosition() < VIRTUAL_STOP_POSITION + VIRTUAL_STOP_SLOWDOWN;
+            if (pushDown) {
+                motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             } else {
-                boolean inSlowdown = motor.getCurrentPosition() < VIRTUAL_STOP_POSITION + VIRTUAL_STOP_SLOWDOWN;
-                double reference = power * MAX_VELOCITY;
-                if (inSlowdown) reference = Math.min(reference, VIRTUAL_STOP_SLOWDOWN_VELOCITY);
-                double powerCommand = velocityPID.update(reference, motor.getVelocity());
-                if (!inSlowdown)
-                    powerCommand = (reference < 0) ? Math.min(powerCommand, 0) : Math.max(powerCommand, 0);
+                motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            }
+            
+            if (pushDown && motor.getCurrentPosition() < 20) {
+                setPower(0);
+            } else {
+                double reference = power * TARGET_VELOCITY;
+                if (inSlowdown) reference = Math.max(reference, -VIRTUAL_STOP_SLOWDOWN_VELOCITY);
+                if (pushDown) reference = -100;
+
+                double powerCommand = velocityPIDF.update(reference, motor.getVelocity());
+                powerCommand = (reference < 0) ? Math.min(powerCommand, 0) : Math.max(powerCommand, 0);
+
                 setPower(powerCommand);
             }
+
             positionPID.reset();
         } else {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
