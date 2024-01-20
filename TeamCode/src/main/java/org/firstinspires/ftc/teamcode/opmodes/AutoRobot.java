@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import android.util.Size;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -7,8 +9,12 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.CodeabotCommon;
+import org.firstinspires.ftc.teamcode.vision.TeamPropDetermination;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 public class AutoRobot extends Robot {
     // Constants for motor encoder counts per revolution
@@ -41,8 +47,14 @@ public class AutoRobot extends Robot {
     // Interial Measurement Unit
     private IMU imu = null;
 
-    public AutoRobot(LinearOpMode opMode) {
+    CodeabotCommon.Alliance alliance = null;
+    TeamPropDetermination teamPropDeterminationProcessor = null;
+    WebcamName webcam = null;
+    VisionPortal visionPortal = null;
+
+    public AutoRobot(LinearOpMode opMode, CodeabotCommon.Alliance alliance) {
         super(opMode);
+        this.alliance = alliance;
     }
 
     @Override
@@ -57,6 +69,23 @@ public class AutoRobot extends Robot {
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+
+        // Initialize VisionPortal and TeamPropDetermination
+        teamPropDeterminationProcessor = new TeamPropDetermination(telemetry, alliance);
+
+        VisionPortal.Builder visionPortalBuilder = new VisionPortal.Builder();
+        webcam = hardwareMap.tryGet(WebcamName.class, "Webcam 1");
+        if (webcam == null) {
+            telemetry.log().add("Webcam not found!");
+        } else {
+            visionPortalBuilder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+        }
+        visionPortal = visionPortalBuilder
+                .addProcessor(teamPropDeterminationProcessor)
+                .setCameraResolution(new Size(640, 480)) // TODO: determine ideal resolution
+                .enableLiveView(true)
+                .setAutoStopLiveView(true)
+                .build();
     }
 
     @Override
@@ -64,6 +93,7 @@ public class AutoRobot extends Robot {
         super.start();
         imu.resetYaw(); // Resets heading to 0
     }
+
     public void driveStraight(double maxDriveSpeed,
                               double distance,
                               double heading) {
