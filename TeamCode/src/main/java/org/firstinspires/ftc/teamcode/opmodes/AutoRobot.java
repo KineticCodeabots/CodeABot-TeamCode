@@ -183,6 +183,7 @@ public class AutoRobot extends Robot {
         driveRobot(0, 0);
     }
 
+    // idk whats this for
     public void holdHeading(double maxTurnSpeed, double heading, double holdTime) {
         ElapsedTime holdTimer = new ElapsedTime();
         holdTimer.reset();
