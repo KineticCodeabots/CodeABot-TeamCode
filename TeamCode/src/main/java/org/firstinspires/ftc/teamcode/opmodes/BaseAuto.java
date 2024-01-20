@@ -19,36 +19,24 @@ public abstract class BaseAuto extends LinearOpMode {
     private final CodeabotCommon.Alliance alliance = CodeabotCommon.Alliance.BLUE;
     private final CodeabotCommon.StartingLocation startingLocation = CodeabotCommon.StartingLocation.AUDIENCE;
 
-    final private AutoRobot robot = new AutoRobot(this);
+    final private AutoRobot robot = new AutoRobot(this, alliance); // TODO: check that correct alliance is passed in
 
     @Override
     public void runOpMode() {
         robot.init();
-        // TODO: move this to AutoRobot
-        // Initialize VisionPortal and TeamPropDetermination
-        TeamPropDetermination teamPropDeterminationProcessor = new TeamPropDetermination(telemetry, alliance);
-
-        VisionPortal.Builder visionPortalBuilder = new VisionPortal.Builder();
-        visionPortalBuilder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .addProcessor(teamPropDeterminationProcessor)
-                .setCameraResolution(new Size(640, 480)) // TODO: determine ideal resolution
-                .enableLiveView(true)
-                .setAutoStopLiveView(true)
-                .build();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         while (opModeInInit()) {
             // TeamPropDetermination telemetry
-            teamPropDeterminationProcessor.addTelemetry();
+            robot.teamPropDeterminationProcessor.addTelemetry();
             telemetry.update();
         }
-        if (!opModeIsActive()) return; // I think I need this /shrug
-        waitForStart();
 
         // Get determined team prop position
-        TeamPropDetermination.Position teamPropPosition = teamPropDeterminationProcessor.getPosition();
+        TeamPropDetermination.Position teamPropPosition = robot.teamPropDeterminationProcessor.getPosition();
+        robot.visionPortal.setProcessorEnabled(robot.teamPropDeterminationProcessor, false);
 
         robot.start();
         robot.resetServos();
