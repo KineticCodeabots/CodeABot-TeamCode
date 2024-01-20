@@ -78,9 +78,8 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addData("Crawling (Left Bumber): Precise (Right Bumber)", "%b : %b", crawlingMode, preciseMode);
 
             telemetry.addLine("\nOperator (Gamepad 2):");
-            // TODO: arm hold telemetry
             telemetry.addData("Arm (Left Stick)", "power (%.2f), position (%d), velocity (%.2f)", robot.armMotor.getPower(), robot.armMotor.getCurrentPosition(), robot.armMotor.getVelocity());
-            telemetry.addData("Hand (A)", "position (%.2f), state (%s)", robot.handPosition, robot.getHandState());
+            telemetry.addData("Hand (A)", "position (%.2f), state (%s)", robot.handPosition, robot.handState);
             telemetry.addData("Gripper (X)", "position (%.2f), open (%b)", robot.gripperPosition, robot.gripperOpen);
 
             telemetry.addData("\nStatus", "Run Time: %.2f", runtime.seconds());

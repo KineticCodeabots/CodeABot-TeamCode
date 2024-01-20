@@ -23,6 +23,7 @@ public class Robot {
     // Servos
     public Servo handServo = null;
     public double handPosition = 0;
+    public HandState handState = HandState.DOWN;
 
     public Servo gripperServo = null;
     public double gripperPosition = 0;
@@ -111,16 +112,6 @@ public class Robot {
     }
 
     /**
-     * Does not call telemetry.update().
-     */
-    public void addTelemetry() {
-        telemetry.addData("Drive", "left (%.2f), right (%.2f)", leftSpeed, rightSpeed);
-        telemetry.addData("Arm", "power (%.2f)", armMotor.getPower());
-        telemetry.addData("Hand", "position (%.2f), state (%s)", handPosition, getHandState());
-        telemetry.addData("Gripper", "position (%.2f), open (%b)", gripperPosition, gripperOpen);
-    }
-
-    /**
      * Reset the servos to its default state
      */
     void resetServos() {
@@ -144,6 +135,7 @@ public class Robot {
      * @param state The state to set the hand servo to
      */
     void setHandState(HandState state) {
+        handState = state;
         switch (state) {
             case DOWN:
                 setHandPosition(0.04);
@@ -155,21 +147,6 @@ public class Robot {
                 setHandPosition(0.8);
                 break;
         }
-    }
-
-    /**
-     * Get the state of the hand servo
-     *
-     * @return The state of the hand servo
-     */
-    public HandState getHandState() {
-        if (handPosition <= 0.05) {
-            return HandState.DOWN;
-        } else if (handPosition == 0.25) {
-            return HandState.BACKDROP;
-        } else if (handPosition == 0.8) {
-            return HandState.UP;
-        } else return null;
     }
 
     /**
