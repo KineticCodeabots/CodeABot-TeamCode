@@ -39,10 +39,6 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "TeleOpMode")
 public class TeleOpMode extends LinearOpMode {
     // Constants
-    final private double DRIVE_SMOOTHING = 2;
-    final private double MAX_TURN = 0.5;
-    final private double ARM_MAX_POWER = 0.4;
-    final private double ARM_DOWN_MAX_POWER = 0.1;
     final private double MAX_CRAWL_SPEED = 0.3;
     final private double MAX_PRECISE_SPEED = 0.15;
 
@@ -98,7 +94,7 @@ public class TeleOpMode extends LinearOpMode {
         preciseMode = currentGamepad1.right_bumper;
 
         // Calculate drive and turn
-        double driveInput = gamepad1.left_stick_y;
+        double driveInput = -gamepad1.left_stick_y;
         double turnInput = gamepad1.right_stick_x;
         double drive = driveInput;
         double turn = turnInput;
@@ -140,10 +136,5 @@ public class TeleOpMode extends LinearOpMode {
         if (currentGamepad2.x && !previousGamepad2.x) {
             robot.setGripperState(!robot.gripperOpen);
         }
-    }
-
-    // TODO: determine helpfullness of this
-    private double smooth(double x, double factor) {
-        return Math.pow(Math.abs(x), factor) * Math.signum(x);
     }
 }
