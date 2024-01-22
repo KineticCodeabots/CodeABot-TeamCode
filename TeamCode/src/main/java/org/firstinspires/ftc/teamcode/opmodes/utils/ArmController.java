@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.Range;
 
 public class ArmController {
     private DcMotorEx motor = null;
-    private final int TARGET_VELOCITY = 600;
+    private final int TARGET_VELOCITY = 800;
     private final double MAX_POWER = 0.3; // For safety reasons
     private final int VIRTUAL_STOP_POSITION = 80;
     private final int VIRTUAL_STOP_THRESSHOLD = 5;
