@@ -7,14 +7,15 @@ import com.qualcomm.robotcore.util.Range;
 public class ArmController {
     private DcMotorEx motor = null;
     private final int TARGET_VELOCITY = 800;
-    private final double MAX_POWER = 0.3; // For safety reasons
+    private final double MAX_POWER = 0.5; // For safety reasons
     private final int VIRTUAL_STOP_POSITION = 80;
     private final int VIRTUAL_STOP_THRESSHOLD = 5;
     private final int VIRTUAL_STOP_SLOWDOWN = 100;
     private final int VIRTUAL_STOP_SLOWDOWN_VELOCITY = 250;
 
     private final PIDF velocityPIDF = new PIDF(0.0005, 0.0000, 0.000, 0.00045);
-    private final PID positionPID = new PID(0.03, 0.002, 0.001);
+    private final PID positionPID = new PID(0.005, 0.001
+            , 0.0);
 
     private boolean onVirtualStop = false;
     private boolean previousZeroing = false;

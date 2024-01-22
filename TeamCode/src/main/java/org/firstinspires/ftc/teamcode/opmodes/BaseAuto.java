@@ -41,15 +41,17 @@ public abstract class BaseAuto extends LinearOpMode {
         robot.start();
         robot.resetServos();
 
-        robot.driveStraight(DRIVE_SPEED, 33, 0);
+        robot.driveStraight(DRIVE_SPEED, 32, 0);
         // TODO: implement spike mark scoring
         robot.setGripperState(false);
         alianceTurnToHeading(TURN_SPEED, -90);
         if (startingLocation == CodeabotCommon.StartingLocation.AUDIENCE) {
-            robot.driveStraight(DRIVE_SPEED, 80, -90);
+            robot.driveStraight(DRIVE_SPEED, 70, -90);
+            alianceTurnToHeading(TURN_SPEED, 0);
+            robot.driveStraight(DRIVE_SPEED, 27, 0);
+            alianceTurnToHeading(TURN_SPEED, -90);
+            robot.driveStraight(DRIVE_SPEED, 15, -90);
         }
-        alianceTurnToHeading(TURN_SPEED, -180);
-        robot.driveStraight(DRIVE_SPEED, 20, -180);
     }
 
     private void alianceTurnToHeading(double maxTurnSpeed, double heading) {
