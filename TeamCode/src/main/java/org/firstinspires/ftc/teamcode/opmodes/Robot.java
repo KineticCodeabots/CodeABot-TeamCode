@@ -167,7 +167,7 @@ public class Robot {
     void setGripperState(boolean open) {
         gripperOpen = open;
         if (open) {
-            gripperPosition = 0.28;
+            gripperPosition = 0.40;
         } else {
             gripperPosition = 0;
         }

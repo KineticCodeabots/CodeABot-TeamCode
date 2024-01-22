@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,11 @@ public class MotorTester extends LinearOpMode {
     List<DcMotorEx> motors = new ArrayList<DcMotorEx>();
     int index = 0;
     int lastIndex = 0;
+
+    Gamepad currentGamepad1 = new Gamepad();
+    Gamepad currentGamepad2 = new Gamepad();
+    Gamepad previousGamepad1 = new Gamepad();
+    Gamepad previousGamepad2 = new Gamepad();
 
     @Override
     public void runOpMode() {
@@ -27,14 +34,21 @@ public class MotorTester extends LinearOpMode {
         waitForStart();
         DcMotorEx motor = motors.get(index);
         while (opModeIsActive()) {
+            previousGamepad1.copy(currentGamepad1);
+            previousGamepad2.copy(currentGamepad2);
+            currentGamepad1.copy(gamepad1);
+            currentGamepad2.copy(gamepad2);
+
             telemetry.addData("Name", "\"%s\"", motorNames.get(index));
+            telemetry.addData("Direction", "%s", motor.getDirection().toString());
+            telemetry.addData("Run Mode", "%s", motor.getMode().toString());
+            telemetry.addData("Zero Power Behavior", "%s", motor.getZeroPowerBehavior().toString());
             telemetry.addData("Power", "%.2f", motor.getPower());
             telemetry.addData("Position", "%d", motor.getCurrentPosition());
             telemetry.addData("Velocity", "%.2f", motor.getVelocity());
-            telemetry.addData("Run Mode", "%s", motor.getMode().toString());
-            telemetry.addData("Zero Power Behavior", "%s", motor.getZeroPowerBehavior().toString());
+            telemetry.update();
 
-            if (gamepad1.a) {
+            if (currentGamepad1.a && !previousGamepad1.a) {
                 DcMotor.RunMode runMode = motor.getMode();
                 if (runMode == DcMotor.RunMode.RUN_USING_ENCODER) {
                     motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -43,7 +57,7 @@ public class MotorTester extends LinearOpMode {
                 }
             }
 
-            if (gamepad1.b) {
+            if (currentGamepad1.b && !previousGamepad1.b) {
                 DcMotor.ZeroPowerBehavior zeroPowerBehavior = motor.getZeroPowerBehavior();
                 if (zeroPowerBehavior == DcMotor.ZeroPowerBehavior.BRAKE) {
                     motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -52,13 +66,22 @@ public class MotorTester extends LinearOpMode {
                 }
             }
 
+            if (currentGamepad1.y && !previousGamepad1.y) {
+                DcMotorSimple.Direction direction = motor.getDirection();
+                if (direction == DcMotorSimple.Direction.FORWARD) {
+                    motor.setDirection(DcMotorSimple.Direction.REVERSE);
+                } else {
+                    motor.setDirection(DcMotorSimple.Direction.FORWARD);
+                }
+            }
+
             motor.setPower(-gamepad1.left_stick_y);
 
-            if (gamepad1.left_bumper) {
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
                 index--;
                 if (index < 0) index = motors.size() - 1;
                 motor = motors.get(index);
-            } else if (gamepad1.right_bumper) {
+            } else if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
                 index++;
                 if (index >= motors.size()) index = 0;
                 motor = motors.get(index);
