@@ -12,5 +12,4 @@ public class RedBackstageAuto extends BaseAuto {
         alliance = CodeabotCommon.Alliance.RED;
         startingLocation = CodeabotCommon.StartingLocation.BACKSTAGE;
     }
-
 }

@@ -12,5 +12,4 @@ public class RedAudienceAuto extends BaseAuto {
         alliance = CodeabotCommon.Alliance.RED;
         startingLocation = CodeabotCommon.StartingLocation.AUDIENCE;
     }
-
 }
