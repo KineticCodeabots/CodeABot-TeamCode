@@ -14,8 +14,8 @@ public class ArmController {
     private final int VIRTUAL_STOP_SLOWDOWN_VELOCITY = 250;
 
     private final PIDF velocityPIDF = new PIDF(0.0005, 0.0000, 0.000, 0.00045);
-    private final PID positionPID = new PID(0.005, 0.001
-            , 0.0);
+    private final PID positionPID = new PID(0.00000, 0.02
+            , 0.0000); // TODO: implement motion profile
 
     private boolean onVirtualStop = false;
     private boolean previousZeroing = false;
@@ -42,7 +42,7 @@ public class ArmController {
                 motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
 
-            if (pushDown && motor.getCurrentPosition() < 20) {
+            if (pushDown && motor.getCurrentPosition() < 5) {
                 setPower(0);
             } else {
                 double reference = power * TARGET_VELOCITY;
