@@ -31,8 +31,8 @@ public class ArmController {
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public void update(double power, boolean pushDown, boolean zeroing) {
-        if ((motor.getCurrentPosition() > VIRTUAL_STOP_POSITION + 10 && !onVirtualStop) || power > 0 || pushDown) {
+    public void update(double power, boolean pushDown, boolean zeroing, boolean hangingOnRigging) {
+        if ((motor.getCurrentPosition() > VIRTUAL_STOP_POSITION + 10 && !onVirtualStop) || power > 0 || pushDown || hangingOnRigging) {
             positionPID.reset();
             onVirtualStop = false;
             boolean inSlowdown = motor.getCurrentPosition() < VIRTUAL_STOP_POSITION + VIRTUAL_STOP_SLOWDOWN;
@@ -52,7 +52,8 @@ public class ArmController {
                 double powerCommand = velocityPIDF.update(reference, motor.getVelocity());
                 powerCommand = (reference < 0) ? Math.min(powerCommand, 0) : Math.max(powerCommand, 0);
 
-                setPower(powerCommand);
+                if (hangingOnRigging) motor.setPower(powerCommand);
+                else setPower(powerCommand);
             }
 
         } else {
