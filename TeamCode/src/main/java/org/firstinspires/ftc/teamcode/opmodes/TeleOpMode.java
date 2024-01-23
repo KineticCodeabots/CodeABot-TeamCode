@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "TeleOpMode")
 public class TeleOpMode extends LinearOpMode {
     // Constants
+    final private double MAX_TURN = 0.6;
     final private double MAX_CRAWL_SPEED = 0.3;
     final private double MAX_PRECISE_SPEED = 0.15;
 
@@ -56,7 +57,7 @@ public class TeleOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot.init();
+        robot.init(true);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -93,18 +94,17 @@ public class TeleOpMode extends LinearOpMode {
         preciseMode = currentGamepad1.right_bumper;
 
         // Calculate drive and turn
-        double driveInput = -gamepad1.left_stick_y;
-        double turnInput = gamepad1.right_stick_x;
-        double drive = driveInput;
-        double turn = turnInput;
+        double drive = -gamepad1.left_stick_y;
+        double turn = gamepad1.right_stick_x;
 
         if (crawlingMode) {
-            drive = driveInput * MAX_CRAWL_SPEED;
-            turn = turnInput * MAX_CRAWL_SPEED;
-        }
-        if (preciseMode) {
-            drive = driveInput * MAX_PRECISE_SPEED;
-            turn = turnInput * MAX_PRECISE_SPEED;
+            drive *= MAX_CRAWL_SPEED;
+            turn *= MAX_CRAWL_SPEED;
+        } else if (preciseMode) {
+            drive *= MAX_PRECISE_SPEED;
+            turn *= MAX_PRECISE_SPEED;
+        } else {
+            turn = turn * MAX_TURN;
         }
 
         // Update motors power
