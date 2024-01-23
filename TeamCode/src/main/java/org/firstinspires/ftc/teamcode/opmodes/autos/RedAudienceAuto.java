@@ -7,6 +7,10 @@ import org.firstinspires.ftc.teamcode.opmodes.BaseAuto;
 
 @Autonomous(name = "Red/Audience", group = "red")
 public class RedAudienceAuto extends BaseAuto {
-    private final CodeabotCommon.Alliance alliance = CodeabotCommon.Alliance.RED;
-    private final CodeabotCommon.StartingLocation startingLocation = CodeabotCommon.StartingLocation.AUDIENCE;
+    public RedAudienceAuto() {
+        super();
+        alliance = CodeabotCommon.Alliance.RED;
+        startingLocation = CodeabotCommon.StartingLocation.AUDIENCE;
+    }
+
 }
