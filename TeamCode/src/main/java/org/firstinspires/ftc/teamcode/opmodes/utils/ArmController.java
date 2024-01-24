@@ -12,8 +12,7 @@ public class ArmController {
     private final int VIRTUAL_STOP_LOWER_POSITION = 75;
 
     private final PIDF velocityPIDF = new PIDF(0.0001, 0.0000, 0.000, 0.00045);
-    private final PID positionPID = new PID(0.0005, 0.01
-            , 0.0001);
+    private final PID positionPID = new PID(0.003, 0.005, 0.001);
 
     private boolean previousZeroing = false;
     private boolean zeroed = false;
