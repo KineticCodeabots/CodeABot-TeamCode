@@ -37,32 +37,28 @@ public abstract class BaseAuto extends LinearOpMode {
             // TeamPropDetermination telemetry
             telemetry.addData("Alliance", alliance.toString());
             telemetry.addData("Starting Location", startingLocation.toString());
-            if (robot.visionPortal != null) {
-                robot.teamPropDeterminationProcessor.addTelemetry();
-            }
+            robot.addTeamPropTelemetry();
             telemetry.update();
         }
 
         waitForStart();
 
-        // TODO: abstract this
         // Get determined team prop position
-        TeamPropDetermination.Position teamPropPosition = robot.teamPropDeterminationProcessor.getPosition();
-        if (robot.visionPortal != null) {
-            robot.visionPortal.setProcessorEnabled(robot.teamPropDeterminationProcessor, false);
-        }
+        TeamPropDetermination.Position teamPropPosition = robot.getTeamPropPosition();
+        robot.setTeamPropDeterminationEnabled(false);
         // TODO: log team prop position
+        telemetry.log().add("Team Prop Position: " + teamPropPosition.toString());
 
         robot.start();
-        robot.setHandPosition(0.6);
+        robot.setHandPosition(0.4);
         robot.setGripperState(false); // TODO: flip gripper state from default open to default closed
 
         // Starts 6.5 inches from truss
 
         // TODO: implement spike mark scoring
-        robot.setGripperState(false);
         if (startingLocation == CodeabotCommon.StartingLocation.AUDIENCE) {
             robot.driveStraight(DRIVE_SPEED, 32, 0);
+            robot.setGripperState(true);
             allianceTurnToHeading(TURN_SPEED, -90);
             robot.driveStraight(DRIVE_SPEED, 70, currentHeadaing);
             allianceTurnToHeading(TURN_SPEED, 0);

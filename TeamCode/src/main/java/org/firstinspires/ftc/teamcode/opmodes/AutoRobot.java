@@ -47,7 +47,7 @@ public class AutoRobot extends Robot {
     private IMU imu = null;
 
     CodeabotCommon.Alliance alliance = null;
-    TeamPropDetermination teamPropDeterminationProcessor = null;
+    TeamPropDetermination teamPropDetermination = null;
     WebcamName webcam = null;
     VisionPortal visionPortal = null;
 
@@ -70,7 +70,7 @@ public class AutoRobot extends Robot {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         // Initialize VisionPortal and TeamPropDetermination
-        teamPropDeterminationProcessor = new TeamPropDetermination(telemetry, alliance);
+        teamPropDetermination = new TeamPropDetermination(telemetry, alliance);
 
         VisionPortal.Builder visionPortalBuilder = new VisionPortal.Builder();
         webcam = hardwareMap.tryGet(WebcamName.class, "Webcam 1");
@@ -80,7 +80,7 @@ public class AutoRobot extends Robot {
             visionPortalBuilder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
         }
         visionPortal = visionPortalBuilder
-                .addProcessor(teamPropDeterminationProcessor)
+                .addProcessor(teamPropDetermination)
                 .setCameraResolution(new Size(640, 480)) // TODO: determine ideal resolution
                 .enableLiveView(true)
                 .setAutoStopLiveView(true)
@@ -91,6 +91,21 @@ public class AutoRobot extends Robot {
     public void start() {
         super.start();
         imu.resetYaw(); // Resets heading to 0
+    }
+
+    public void addTeamPropTelemetry() {
+        if (teamPropDetermination != null) teamPropDetermination.addTelemetry();
+    }
+
+    public TeamPropDetermination.Position getTeamPropPosition() {
+        if (teamPropDetermination != null) return teamPropDetermination.getPosition();
+        return null;
+    }
+
+    public void setTeamPropDeterminationEnabled(boolean enabled) {
+        if (visionPortal != null) {
+            visionPortal.setProcessorEnabled(teamPropDetermination, enabled);
+        }
     }
 
     public void driveStraight(double maxDriveSpeed,
