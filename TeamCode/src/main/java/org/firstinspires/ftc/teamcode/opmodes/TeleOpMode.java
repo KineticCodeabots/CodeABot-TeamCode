@@ -81,7 +81,7 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addData("Crawling (Left Bumber): Precise (Right Bumber)", "%b : %b", crawlingMode, preciseMode);
 
             telemetry.addLine("\nOperator (Gamepad 2):");
-            telemetry.addData("Arm (Left Stick)", "power (%.2f), position (%d), velocity (%.2f)", robot.armMotor.getPower(), robot.armMotor.getCurrentPosition(), robot.armMotor.getVelocity());
+            telemetry.addData("Arm (Left Stick)", "power (%.2f), position (%d), velocity (%.2f)", robot.armMotor.getPower(), robot.arm.getCurrentPosition(), robot.armMotor.getVelocity());
             telemetry.addData("Hand (A)", "position (%.2f), state (%s)", robot.handPosition, robot.handState);
             telemetry.addData("Gripper (X)", "position (%.2f), open (%b)", robot.gripperPosition, robot.gripperOpen);
 
@@ -119,6 +119,12 @@ public class TeleOpMode extends LinearOpMode {
                 -currentGamepad2.left_stick_y * (ARM_POWER + ((1 - ARM_POWER) * (double) currentGamepad2.right_trigger)),
                 !currentGamepad2.left_bumper,
                 currentGamepad2.right_bumper);
+
+        if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
+            robot.arm.encoderOffset += 10;
+        } else if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left) {
+            robot.arm.encoderOffset -= 10;
+        }
 
         if (currentGamepad2.dpad_up) {
             robot.setHandPosition(Range.clip(robot.handPosition + 0.003, 0, 1));
