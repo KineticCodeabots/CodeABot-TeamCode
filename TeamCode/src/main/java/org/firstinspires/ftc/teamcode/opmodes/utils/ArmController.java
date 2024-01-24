@@ -11,11 +11,13 @@ public class ArmController {
     private final int VIRTUAL_STOP_UPPER_POSITION = 85;
     private final int VIRTUAL_STOP_LOWER_POSITION = 75;
 
-    private final PIDF velocityPIDF = new PIDF(0.0001, 0.0000, 0.000, 0.00045);
+    private final PIDF velocityPIDF = new PIDF(0.0005, 0.0000, 0.000, 0.00045);
     private final PID positionPID = new PID(0.003, 0.005, 0.001);
 
     private boolean previousZeroing = false;
     private boolean zeroed = false;
+
+    public int encoderOffset = 0;
 
     public ArmController(DcMotorEx motor) {
         this.motor = motor;
@@ -29,11 +31,12 @@ public class ArmController {
     }
 
     public void updateArmState(double power, boolean virtualStop, boolean zeroing) {
+        int encoderPosition = getCurrentPosition();
         double powerCommand = 0;
-        if (zeroed && !zeroing && virtualStop && motor.getCurrentPosition() < VIRTUAL_STOP_UPPER_POSITION) {
+        if (zeroed && !zeroing && virtualStop && encoderPosition < VIRTUAL_STOP_UPPER_POSITION) {
             powerCommand = Math.max(power, 0);
-            if (motor.getCurrentPosition() < VIRTUAL_STOP_LOWER_POSITION) {
-                powerCommand = positionPID.update(VIRTUAL_STOP_LOWER_POSITION, motor.getCurrentPosition()) + powerCommand;
+            if (encoderPosition < VIRTUAL_STOP_LOWER_POSITION) {
+                powerCommand = positionPID.update(VIRTUAL_STOP_LOWER_POSITION, encoderPosition) + powerCommand;
             } else {
                 motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
@@ -41,7 +44,7 @@ public class ArmController {
             powerCommand = power;
             if (!virtualStop) {
                 motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                if (zeroed && motor.getCurrentPosition() < 10)
+                if (zeroed && power <= 0 && motor.getCurrentPosition() < 10)
                     powerCommand = 0;
             } else if (powerCommand == 0) {
                 motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -59,6 +62,10 @@ public class ArmController {
         }
         previousZeroing = zeroing;
         setLimitedPower(powerCommand);
+    }
+
+    public int getCurrentPosition() {
+        return motor.getCurrentPosition() + encoderOffset;
     }
 
     void setLimitedPower(double power) {
