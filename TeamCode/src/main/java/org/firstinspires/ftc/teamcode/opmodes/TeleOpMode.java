@@ -43,6 +43,8 @@ public class TeleOpMode extends LinearOpMode {
     final private double MAX_CRAWL_SPEED = 0.3;
     final private double MAX_PRECISE_SPEED = 0.15;
 
+    final private double ARM_POWER = 0.3;
+
     // Gamepads to determine state changes.
     Gamepad currentGamepad1 = new Gamepad();
     Gamepad currentGamepad2 = new Gamepad();
@@ -57,7 +59,7 @@ public class TeleOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot.init(true);
+        robot.init();
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -104,7 +106,7 @@ public class TeleOpMode extends LinearOpMode {
             drive *= MAX_PRECISE_SPEED;
             turn *= MAX_PRECISE_SPEED;
         } else {
-            turn = turn * MAX_TURN;
+            turn *= MAX_TURN;
         }
 
         // Update motors power
@@ -113,9 +115,9 @@ public class TeleOpMode extends LinearOpMode {
 
     void updateArm() {
         // Update arm power
-        robot.arm.update(
-                -currentGamepad2.left_stick_y,
-                currentGamepad2.left_bumper,
+        robot.arm.updateArmState(
+                -currentGamepad2.left_stick_y * (ARM_POWER + ((1 - ARM_POWER) * (double) currentGamepad2.right_trigger)),
+                !currentGamepad2.left_bumper,
                 currentGamepad2.right_bumper);
 
         if (currentGamepad2.dpad_up) {
@@ -126,7 +128,7 @@ public class TeleOpMode extends LinearOpMode {
         // Change hand position using A, B, and Y buttons
         if (currentGamepad2.a && !previousGamepad2.a) {
             robot.setHandState(Robot.HandState.DOWN);
-        } else if (currentGamepad2.b && !previousGamepad2.b) {
+        } else if (currentGamepad2.b && !previousGamepad2.b && !currentGamepad2.start) {
             robot.setHandState(Robot.HandState.BACKDROP);
         } else if (currentGamepad2.y && !previousGamepad2.y) {
             robot.setHandState(Robot.HandState.UP);
