@@ -16,7 +16,7 @@ public abstract class BaseAuto extends LinearOpMode {
     protected CodeabotCommon.Alliance alliance = null;
     protected CodeabotCommon.StartingLocation startingLocation = null;
 
-    private AutoRobot robot = null; // TODO: check that correct alliance is passed in
+    private AutoRobot robot = null;
 
     public BaseAuto(CodeabotCommon.Alliance alliance, CodeabotCommon.StartingLocation startingLocation) {
         this.alliance = alliance;
@@ -31,8 +31,6 @@ public abstract class BaseAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        // TODO: better way of detecting that teampropdetermination is available
-
         while (opModeInInit()) {
             // TeamPropDetermination telemetry
             telemetry.addData("Alliance", alliance.toString());
@@ -46,7 +44,6 @@ public abstract class BaseAuto extends LinearOpMode {
         // Get determined team prop position
         TeamPropDetermination.Position teamPropPosition = robot.getTeamPropPosition();
         robot.setTeamPropDeterminationEnabled(false);
-        // TODO: log team prop position
         telemetry.log().add("Team Prop Position: " + teamPropPosition.toString());
 
         robot.start();
