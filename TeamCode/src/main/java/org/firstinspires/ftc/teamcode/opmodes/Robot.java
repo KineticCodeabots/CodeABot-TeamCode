@@ -164,12 +164,12 @@ public class Robot {
      *
      * @param open Whether the gripper is opened or closed
      */
-    void setGripperState(boolean open) {
+    void setGripperState(boolean closed) {
         gripperOpen = open;
-        if (open) {
-            gripperPosition = 0.40;
-        } else {
+        if (closed) {
             gripperPosition = 0;
+        } else {
+            gripperPosition = 0.40;
         }
         setGripperPosition(gripperPosition);
     }
