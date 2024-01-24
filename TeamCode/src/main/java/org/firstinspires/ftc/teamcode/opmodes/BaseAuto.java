@@ -48,14 +48,14 @@ public abstract class BaseAuto extends LinearOpMode {
 
         robot.start();
         robot.setHandPosition(0.4);
-        robot.setGripperState(false); // TODO: flip gripper state from default open to default closed
+        robot.setGripperState(true);
 
         // Starts 6.5 inches from truss
 
         // TODO: implement spike mark scoring
         if (startingLocation == CodeabotCommon.StartingLocation.AUDIENCE) {
             robot.driveStraight(DRIVE_SPEED, 32, 0);
-            robot.setGripperState(true);
+            robot.setGripperState(false);
             allianceTurnToHeading(TURN_SPEED, -90);
             robot.driveStraight(DRIVE_SPEED, 70, currentHeadaing);
             allianceTurnToHeading(TURN_SPEED, 0);
