@@ -30,7 +30,6 @@ public class AutoRobot extends Robot {
     // Tolerated degrees to target heading
     static final double HEADING_THRESHOLD = 1.0;
     // Proportional speed constant for turning in different situations
-    // TODO: tune maybe?
     static final double P_TURN_GAIN = 0.02;
     static final double P_DRIVE_GAIN = 0.03;
     // Distance to accelerate and decelerate

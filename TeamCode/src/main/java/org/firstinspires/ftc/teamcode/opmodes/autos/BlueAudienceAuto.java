@@ -8,8 +8,6 @@ import org.firstinspires.ftc.teamcode.opmodes.BaseAuto;
 @Autonomous(name = "Blue/Audience", group = "blue")
 public class BlueAudienceAuto extends BaseAuto {
     public BlueAudienceAuto() {
-        super();
-        alliance = CodeabotCommon.Alliance.BLUE;
-        startingLocation = CodeabotCommon.StartingLocation.AUDIENCE;
+        super(CodeabotCommon.Alliance.BLUE, CodeabotCommon.StartingLocation.AUDIENCE);
     }
 }
