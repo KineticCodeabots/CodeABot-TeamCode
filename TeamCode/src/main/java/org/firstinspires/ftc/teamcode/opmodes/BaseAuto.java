@@ -13,10 +13,16 @@ public abstract class BaseAuto extends LinearOpMode {
     private double currentHeadaing = 0;
 
     // Match State
-    protected CodeabotCommon.Alliance alliance = CodeabotCommon.Alliance.BLUE;
-    protected CodeabotCommon.StartingLocation startingLocation = CodeabotCommon.StartingLocation.AUDIENCE;
+    protected CodeabotCommon.Alliance alliance = null;
+    protected CodeabotCommon.StartingLocation startingLocation = null;
 
-    final private AutoRobot robot = new AutoRobot(this, alliance); // TODO: check that correct alliance is passed in
+    private AutoRobot robot = null; // TODO: check that correct alliance is passed in
+
+    public BaseAuto(CodeabotCommon.Alliance alliance, CodeabotCommon.StartingLocation startingLocation) {
+        this.alliance = alliance;
+        this.startingLocation = startingLocation;
+        this.robot = new AutoRobot(this, alliance);
+    }
 
     @Override
     public void runOpMode() {

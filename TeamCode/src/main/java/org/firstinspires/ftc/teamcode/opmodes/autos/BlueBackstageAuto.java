@@ -8,8 +8,6 @@ import org.firstinspires.ftc.teamcode.opmodes.BaseAuto;
 @Autonomous(name = "Blue/Backstage", group = "blue")
 public class BlueBackstageAuto extends BaseAuto {
     public BlueBackstageAuto() {
-        super();
-        alliance = CodeabotCommon.Alliance.BLUE;
-        startingLocation = CodeabotCommon.StartingLocation.BACKSTAGE;
+        super(CodeabotCommon.Alliance.BLUE, CodeabotCommon.StartingLocation.BACKSTAGE);
     }
 }
