@@ -53,7 +53,7 @@ public class ArmController {
 
             if (!virtualStop) {
                 // When bypassing virtual stop allow motor to float and turn off when close to ground.
-                motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                if (limitPower) motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
                 if (zeroed && power <= 0 && motor.getCurrentPosition() < 10)
                     powerCommand = 0;
