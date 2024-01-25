@@ -31,7 +31,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -82,8 +81,8 @@ public class TeleOpMode extends LinearOpMode {
 
             telemetry.addLine("\nOperator (Gamepad 2):");
             telemetry.addData("Arm (Left Stick)", "power (%.2f), position (%d), velocity (%.2f)", robot.armMotor.getPower(), robot.arm.getCurrentPosition(), robot.armMotor.getVelocity());
-            telemetry.addData("Hand (A)", "position (%.2f), state (%s)", robot.handPosition, robot.handState);
-            telemetry.addData("Gripper (X)", "position (%.2f), open (%b)", robot.gripperPosition, robot.gripperOpen);
+            telemetry.addData("Hand (A,B,Y)", "position (%.2f), state (%s)", robot.handPosition, robot.handState);
+            telemetry.addData("Gripper (X)", "position (%.2f), closed (%b)", robot.gripperPosition, robot.gripperClosed);
 
             telemetry.addData("\nStatus", "Run Time: %.2f", runtime.seconds());
             telemetry.update();
@@ -117,8 +116,8 @@ public class TeleOpMode extends LinearOpMode {
         // Update arm power
         robot.arm.updateArmState(
                 -currentGamepad2.left_stick_y * (ARM_POWER + ((1 - ARM_POWER) * (double) currentGamepad2.right_trigger)),
-                !currentGamepad2.left_bumper,
-                currentGamepad2.right_bumper);
+                !currentGamepad2.left_bumper && currentGamepad2.right_trigger == 0,
+                currentGamepad2.right_bumper, currentGamepad2.right_trigger == 0);
 
         if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
             robot.arm.encoderOffset += 10;
@@ -141,7 +140,7 @@ public class TeleOpMode extends LinearOpMode {
         }
         // Toggle gripper position using X button
         if (currentGamepad2.x && !previousGamepad2.x) {
-            robot.setGripperState(!robot.gripperOpen);
+            robot.setGripperState(!robot.gripperClosed);
         }
     }
 }

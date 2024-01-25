@@ -30,26 +30,39 @@ public class ArmController {
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public void updateArmState(double power, boolean virtualStop, boolean zeroing) {
+    /**
+     * Updates the state of the arm
+     */
+    public void updateArmState(double power, boolean virtualStop, boolean zeroing, boolean limitPower) {
         int encoderPosition = getCurrentPosition();
+
         double powerCommand = 0;
         if (zeroed && !zeroing && virtualStop && encoderPosition < VIRTUAL_STOP_UPPER_POSITION) {
+            // Only allow upward power
             powerCommand = Math.max(power, 0);
+
             if (encoderPosition < VIRTUAL_STOP_LOWER_POSITION) {
-                powerCommand = positionPID.update(VIRTUAL_STOP_LOWER_POSITION, encoderPosition) + powerCommand;
+                powerCommand += positionPID.update(VIRTUAL_STOP_LOWER_POSITION, encoderPosition);
             } else {
                 motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
         } else {
+            // Reset position PID if not in virtual stop range
+            positionPID.reset();
             powerCommand = power;
+
             if (!virtualStop) {
+                // When bypassing virtual stop allow motor to float and turn off when close to ground.
                 motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
                 if (zeroed && power <= 0 && motor.getCurrentPosition() < 10)
                     powerCommand = 0;
             } else if (powerCommand == 0) {
+                // Brake, and run velocity PID if power is zero
                 motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 powerCommand = velocityPIDF.update(powerCommand, motor.getVelocity());
             } else if (motor.getVelocity() < MAX_DOWN_VELOCITY) {
+                // If moving too fast downwards turn off power and float.
                 motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 powerCommand = 0;
             }
@@ -58,16 +71,29 @@ public class ArmController {
         if (previousZeroing && !zeroing) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            encoderOffset = 0;
             zeroed = true;
         }
+
         previousZeroing = zeroing;
-        setLimitedPower(powerCommand);
+
+        if (limitPower) {
+            setLimitedPower(powerCommand);
+        } else {
+            motor.setPower(powerCommand);
+        }
     }
 
+    /**
+     * Encoder position plus offset
+     */
     public int getCurrentPosition() {
         return motor.getCurrentPosition() + encoderOffset;
     }
 
+    /**
+     * Limits power sent to motors
+     */
     void setLimitedPower(double power) {
         motor.setPower(Range.clip(power, -MAX_POWER, MAX_POWER));
     }
