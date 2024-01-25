@@ -27,7 +27,7 @@ public class Robot {
 
     public Servo gripperServo = null;
     public double gripperPosition = 0;
-    public boolean gripperOpen = false;
+    public boolean gripperClosed = false;
 
     // OpMode
     final public LinearOpMode opMode;
@@ -162,10 +162,10 @@ public class Robot {
     /**
      * Set the state of the gripper servo
      *
-     * @param open Whether the gripper is opened or closed
+     * @param closed Whether the gripper is closed or open
      */
     void setGripperState(boolean closed) {
-        gripperOpen = open;
+        gripperClosed = closed;
         if (closed) {
             gripperPosition = 0;
         } else {

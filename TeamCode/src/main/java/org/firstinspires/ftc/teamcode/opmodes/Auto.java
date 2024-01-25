@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.CodeabotCommon;
 import org.firstinspires.ftc.teamcode.vision.TeamPropDetermination;
 
-public abstract class BaseAuto extends LinearOpMode {
+public abstract class Auto extends LinearOpMode {
     // Constants
     private static final double DRIVE_SPEED = 0.7;
     private static final double TURN_SPEED = 0.2;
@@ -18,7 +18,7 @@ public abstract class BaseAuto extends LinearOpMode {
 
     private AutoRobot robot = null;
 
-    public BaseAuto(CodeabotCommon.Alliance alliance, CodeabotCommon.StartingLocation startingLocation) {
+    public Auto(CodeabotCommon.Alliance alliance, CodeabotCommon.StartingLocation startingLocation) {
         this.alliance = alliance;
         this.startingLocation = startingLocation;
         this.robot = new AutoRobot(this, alliance);
@@ -52,20 +52,19 @@ public abstract class BaseAuto extends LinearOpMode {
 
         // Starts 6.5 inches from truss
 
-        // TODO: implement spike mark scoring
         if (startingLocation == CodeabotCommon.StartingLocation.AUDIENCE) {
-            robot.driveStraight(DRIVE_SPEED, 32, 0);
+            driveStraight(32);
             robot.setGripperState(false);
             allianceTurnToHeading(TURN_SPEED, -90);
-            robot.driveStraight(DRIVE_SPEED, 70, currentHeadaing);
+            driveStraight(70);
             allianceTurnToHeading(TURN_SPEED, 0);
-            robot.driveStraight(DRIVE_SPEED, 27, currentHeadaing);
+            driveStraight(27);
             allianceTurnToHeading(TURN_SPEED, -90);
-            robot.driveStraight(DRIVE_SPEED, 20, currentHeadaing);
+            driveStraight(20);
         } else {
-            robot.driveStraight(DRIVE_SPEED, 7, 0);
+            driveStraight(7);
             allianceTurnToHeading(TURN_SPEED, -90);
-            robot.driveStraight(DRIVE_SPEED, 30, currentHeadaing);
+            driveStraight(30);
         }
     }
 
@@ -77,5 +76,9 @@ public abstract class BaseAuto extends LinearOpMode {
             robot.turnToHeading(maxTurnSpeed, -heading);
             currentHeadaing = -heading;
         }
+    }
+
+    private void driveStraight(double distance) {
+        robot.driveStraight(DRIVE_SPEED, distance, currentHeadaing);
     }
 }
