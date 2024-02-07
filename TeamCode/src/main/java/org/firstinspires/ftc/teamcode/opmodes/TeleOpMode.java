@@ -120,9 +120,9 @@ public class TeleOpMode extends LinearOpMode {
                 currentGamepad2.right_bumper, currentGamepad2.right_trigger == 0);
 
         if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
-            robot.arm.encoderOffset += 10;
+            robot.arm.encoderOffset += 20;
         } else if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left) {
-            robot.arm.encoderOffset -= 10;
+            robot.arm.encoderOffset -= 20;
         }
 
         if (currentGamepad2.dpad_up) {

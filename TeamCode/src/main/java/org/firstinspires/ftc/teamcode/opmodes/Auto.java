@@ -54,11 +54,11 @@ public abstract class Auto extends LinearOpMode {
 
         if (startingLocation == CodeabotCommon.StartingLocation.AUDIENCE) {
             driveStraight(32);
-            robot.setGripperState(false);
+//            robot.setGripperState(false);
             allianceTurnToHeading(TURN_SPEED, -90);
             driveStraight(70);
             allianceTurnToHeading(TURN_SPEED, 0);
-            driveStraight(27);
+            driveStraight(29);
             allianceTurnToHeading(TURN_SPEED, -90);
             driveStraight(20);
         } else {
