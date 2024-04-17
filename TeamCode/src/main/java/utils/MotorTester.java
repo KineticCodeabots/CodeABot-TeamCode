@@ -13,7 +13,7 @@ import java.util.List;
 @TeleOp(name = "Motor Tester", group = "Utils")
 public class MotorTester extends LinearOpMode {
     List<String> motorNames = null;
-    List<DcMotorEx> motors = new ArrayList<DcMotorEx>();
+    List<DcMotorEx> motors = new ArrayList<>();
     int index = 0;
     int lastIndex = 0;
 
@@ -24,7 +24,7 @@ public class MotorTester extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        motorNames = new ArrayList<String>(hardwareMap.getAllNames(DcMotorEx.class));
+        motorNames = new ArrayList<>(hardwareMap.getAllNames(DcMotorEx.class));
         for (String name : motorNames) {
             DcMotorEx motor = hardwareMap.get(DcMotorEx.class, name);
             motors.add(motor);
