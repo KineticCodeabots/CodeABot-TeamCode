@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +48,7 @@ public class MotorTester extends LinearOpMode {
             telemetry.addData("Power", "%.2f", motor.getPower());
             telemetry.addData("Position", "%d", motor.getCurrentPosition());
             telemetry.addData("Velocity", "%.2f", motor.getVelocity());
+            telemetry.addData("Current", "%.2f", motor.getCurrent(CurrentUnit.AMPS));
             telemetry.update();
 
             if (currentGamepad1.a && !previousGamepad1.a) {
