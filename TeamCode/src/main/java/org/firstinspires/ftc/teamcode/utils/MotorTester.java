@@ -83,13 +83,14 @@ public class MotorTester extends LinearOpMode {
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
                 index--;
                 if (index < 0) index = motors.size() - 1;
-                motor = motors.get(index);
             } else if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
                 index++;
                 if (index >= motors.size()) index = 0;
+            }
+            if (index != lastIndex) {
+                motor.setPower(0);
                 motor = motors.get(index);
             }
-            if (index != lastIndex) motor.setPower(0);
 
             lastIndex = index;
         }
