@@ -1,9 +1,0 @@
-{
-  "sourcesPath": ".",
-  "resourcesPath": ".",
-  "excludedPaths": [
-    "opmodes"
-  ],
-  "excludedFileExtensions": [],
-  "eocvSimVersion": "3.5.2"
-}
