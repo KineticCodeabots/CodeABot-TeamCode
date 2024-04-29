@@ -7,30 +7,30 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 
 public class Auto extends LinearOpMode {
-    public enum ALLIANCE {
+    public enum Alliance {
         BLUE,
         RED
     }
 
-    public enum STARTING_LOCATION {
+    public enum StartingLocation {
         LEFT,
         RIGHT
     }
 
-    public ALLIANCE alliance;
-    public STARTING_LOCATION startingLocation;
+    public Alliance alliance;
+    public StartingLocation startingLocation;
 
-    public Auto(ALLIANCE alliance, STARTING_LOCATION startingLocation) {
+    public Auto(Alliance alliance, StartingLocation startingLocation) {
         this.alliance = alliance;
         this.startingLocation = startingLocation;
     }
 
     @Override
     public void runOpMode() {
-        if (alliance == ALLIANCE.RED) {
+        if (alliance == Alliance.RED) {
             // flip direction
         }
-        if (startingLocation == STARTING_LOCATION.LEFT) {
+        if (startingLocation == StartingLocation.LEFT) {
             // left auto
         } else {
             // right auto
@@ -39,8 +39,8 @@ public class Auto extends LinearOpMode {
 
     @OpModeRegistrar
     public static void register(OpModeManager manager) {
-        for (ALLIANCE selectedAlliance : ALLIANCE.values()) {
-            for (STARTING_LOCATION selectedStartingLocation : STARTING_LOCATION.values()) {
+        for (Alliance selectedAlliance : Alliance.values()) {
+            for (StartingLocation selectedStartingLocation : StartingLocation.values()) {
                 OpModeMeta meta = new OpModeMeta.Builder()
                         .setName(String.format("%s:%s", selectedAlliance, selectedStartingLocation))
                         .setGroup(selectedAlliance.toString())
