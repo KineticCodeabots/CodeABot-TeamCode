@@ -27,6 +27,10 @@ public class Auto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        telemetry.addData("Alliance", alliance);
+        telemetry.addData("Starting Location", startingLocation);
+        telemetry.update();
+        waitForStart();
         if (alliance == ALLIANCE.RED) {
             // flip direction
         }
@@ -48,12 +52,7 @@ public class Auto extends LinearOpMode {
                         .setTransitionTarget("TeleOp")
                         .build();
 
-                class ConfiguredAuto extends Auto {
-                    public ConfiguredAuto() {
-                        super(selectedAlliance, selectedStartingLocation);
-                    }
-                }
-                manager.register(meta, ConfiguredAuto.class);
+                manager.register(meta, new Auto(selectedAlliance, selectedStartingLocation));
             }
         }
     }
