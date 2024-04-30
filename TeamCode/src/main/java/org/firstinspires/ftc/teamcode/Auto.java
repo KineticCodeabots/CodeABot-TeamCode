@@ -31,7 +31,7 @@ public class Auto extends LinearOpMode {
         telemetry.addData("Starting Location", startingLocation);
         telemetry.update();
         waitForStart();
-        if (alliance == ALLIANCE.RED) {
+        if (alliance == Alliance.RED) {
             // flip direction
         }
         if (startingLocation == StartingLocation.LEFT) {
