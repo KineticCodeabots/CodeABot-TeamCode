@@ -16,8 +16,8 @@ import java.util.List;
 
 @TeleOp(name = "Motor Tester", group = "Utils")
 public class MotorTester extends LinearOpMode {
-    List<String> motorNames = null;
-    List<DcMotorEx> motors = new ArrayList<>();
+    String[] motorNames = null;
+    DcMotorEx[] motors = null;
     int index = 0;
     int lastIndex = 0;
 
@@ -33,22 +33,23 @@ public class MotorTester extends LinearOpMode {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        motorNames = new ArrayList<>(hardwareMap.getAllNames(DcMotorEx.class));
-        for (String name : motorNames) {
+        motorNames = hardwareMap.getAllNames(DcMotorEx.class).toArray(new String[0]);
+        for (int i = 0; i < motorNames.length; i++) {
+            String name = motorNames[i];
             DcMotorEx motor = hardwareMap.get(DcMotorEx.class, name);
-            motors.add(motor);
+            motors[i] = motor;
             telemetry.addData("Motor", "\"%s\": position (%d)", name, motor.getCurrentPosition());
         }
         telemetry.update();
         waitForStart();
-        DcMotorEx motor = motors.get(index);
+        DcMotorEx motor = motors[index];
         while (opModeIsActive()) {
             previousGamepad1.copy(currentGamepad1);
             previousGamepad2.copy(currentGamepad2);
             currentGamepad1.copy(gamepad1);
             currentGamepad2.copy(gamepad2);
 
-            telemetry.addData("Name:", "\"%s\"", motorNames.get(index));
+            telemetry.addData("Name:", "\"%s\"", motor.getDeviceName());
             telemetry.addData("Port:", "%d", motor.getPortNumber());
             telemetry.addData("Direction (Y):", "%s", motor.getDirection().toString());
             telemetry.addData("Zero Power Behavior (A):", "%s", motor.getZeroPowerBehavior().toString());
@@ -102,14 +103,14 @@ public class MotorTester extends LinearOpMode {
 
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
                 index--;
-                if (index < 0) index = motors.size() - 1;
+                if (index < 0) index = motors.length - 1;
             } else if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
                 index++;
-                if (index >= motors.size()) index = 0;
+                if (index >= motors.length) index = 0;
             }
             if (index != lastIndex) {
                 motor.setPower(0);
-                motor = motors.get(index);
+                motor = motors[index];
             }
 
             lastIndex = index;
