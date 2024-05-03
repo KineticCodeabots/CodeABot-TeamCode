@@ -34,6 +34,7 @@ public class MotorTester extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
         motorNames = hardwareMap.getAllNames(DcMotorEx.class).toArray(new String[0]);
+        motors = new DcMotorEx[motorNames.length];
         for (int i = 0; i < motorNames.length; i++) {
             String name = motorNames[i];
             DcMotorEx motor = hardwareMap.get(DcMotorEx.class, name);
@@ -49,12 +50,12 @@ public class MotorTester extends LinearOpMode {
             currentGamepad1.copy(gamepad1);
             currentGamepad2.copy(gamepad2);
 
-            telemetry.addData("Name:", "\"%s\"", motor.getDeviceName());
+            telemetry.addData("Name:", "\"%s\"", motorNames[index]);
             telemetry.addData("Port:", "%d", motor.getPortNumber());
             telemetry.addData("Direction (Y):", "%s", motor.getDirection().toString());
             telemetry.addData("Zero Power Behavior (A):", "%s", motor.getZeroPowerBehavior().toString());
             telemetry.addData("Run Mode (B):", "%s", motor.getMode().toString());
-            telemetry.addData(hold ? "Power (HOLD L1/R1):" : "Power:", "%.2f", motor.getPower());
+            telemetry.addData(hold ? "Power (HOLD, Dpad Up/Down):" : "Power:", "%.2f", motor.getPower());
             telemetry.addData("Position:", "%d", motor.getCurrentPosition());
             telemetry.addData("Velocity:", "%.2f", motor.getVelocity());
             telemetry.addData("Current:", "%.2f", motor.getCurrent(CurrentUnit.AMPS));
@@ -94,9 +95,9 @@ public class MotorTester extends LinearOpMode {
             if (!hold) {
                 motor.setPower(-gamepad1.left_stick_y);
             } else {
-                if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
+                if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down) {
                     motor.setPower(motor.getPower() - 0.05);
-                } else if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+                } else if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
                     motor.setPower(motor.getPower() + 0.05);
                 }
             }
