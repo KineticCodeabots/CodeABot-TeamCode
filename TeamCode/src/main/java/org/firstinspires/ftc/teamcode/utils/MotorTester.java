@@ -50,15 +50,16 @@ public class MotorTester extends LinearOpMode {
             currentGamepad1.copy(gamepad1);
             currentGamepad2.copy(gamepad2);
 
-            telemetry.addData("Name:", "\"%s\"", motorNames[index]);
-            telemetry.addData("Port:", "%d", motor.getPortNumber());
-            telemetry.addData("Direction (Y):", "%s", motor.getDirection().toString());
-            telemetry.addData("Zero Power Behavior (A):", "%s", motor.getZeroPowerBehavior().toString());
-            telemetry.addData("Run Mode (B):", "%s", motor.getMode().toString());
-            telemetry.addData(hold ? "Power (HOLD, Dpad Up/Down):" : "Power:", "%.2f", motor.getPower());
-            telemetry.addData("Position:", "%d", motor.getCurrentPosition());
-            telemetry.addData("Velocity:", "%.2f", motor.getVelocity());
-            telemetry.addData("Current:", "%.2f", motor.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("Name", "\"%s\"", motorNames[index]);
+            telemetry.addData("Port", "%d", motor.getPortNumber());
+            telemetry.addData("Direction (Y)", "%s", motor.getDirection().toString());
+            telemetry.addData("Zero Power Behavior (A)", "%s", motor.getZeroPowerBehavior().toString());
+            telemetry.addData("Run Mode (B)", "%s", motor.getMode().toString());
+            telemetry.addData("Power", "%.2f", motor.getPower());
+            telemetry.addData("Hold (A, DPad Up/Down)", "%b", hold);
+            telemetry.addData("Position", "%d", motor.getCurrentPosition());
+            telemetry.addData("Velocity", "%.2f", motor.getVelocity());
+            telemetry.addData("Current", "%.2f", motor.getCurrent(CurrentUnit.AMPS));
             telemetry.update();
 
             if (currentGamepad1.b && !previousGamepad1.b) {
