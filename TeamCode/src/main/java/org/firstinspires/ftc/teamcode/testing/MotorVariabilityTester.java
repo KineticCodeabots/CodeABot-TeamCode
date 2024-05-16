@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +56,9 @@ public class MotorVariabilityTester extends OpMode {
     public void init() {
         motors = new ArrayList<>(hardwareMap.dcMotor.entrySet());
         motors.sort(MotorVariabilityTester.motorComparator);
+        if (motors.isEmpty()) {
+            requestOpModeStop();
+        }
     }
 
     @SuppressLint("DefaultLocale")
@@ -99,9 +103,11 @@ public class MotorVariabilityTester extends OpMode {
                 double currentStdDev = standardDeviation(motorCurrentSamples);
                 motorPowerResults.put(motorPower, new MotorPowerResults(velocityMean, velocityStdDev, currentMean, currentStdDev));
 
-                motorPower = Math.max(motorPower * 2, 1);
+                motorPower = Math.min(motorPower * 2, 1);
                 motorRuntime.reset();
                 motorSampleIndex = 0;
+                Arrays.fill(motorVelocitySamples, 0.0);
+                Arrays.fill(motorCurrentSamples, 0.0);
             }
         } else if (motorRuntime.seconds() > 1) {
             motorVelocitySamples[motorSampleIndex] = selectedMotor.getVelocity();
@@ -112,14 +118,18 @@ public class MotorVariabilityTester extends OpMode {
 
     @Override
     public void stop() {
-        telemetry.addLine("Results");
-        for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
-            MotorPowerResults motorPowerResult = entry.getValue();
-            telemetry.addLine(entry.getKey().toString())
-                    .addData("velMean", motorPowerResult.velocityMean)
-                    .addData("velStdDev", motorPowerResult.velocityStdDev)
-                    .addData("curMean", motorPowerResult.currentMean)
-                    .addData("curStdDev", motorPowerResult.currentStdDev);
+        if (motors.isEmpty()) {
+            telemetry.addLine("No motors found");
+        } else {
+            telemetry.addLine("Results");
+            for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
+                MotorPowerResults motorPowerResult = entry.getValue();
+                telemetry.addLine(entry.getKey().toString())
+                        .addData("velMean", motorPowerResult.velocityMean)
+                        .addData("velStdDev", motorPowerResult.velocityStdDev)
+                        .addData("curMean", motorPowerResult.currentMean)
+                        .addData("curStdDev", motorPowerResult.currentStdDev);
+            }
         }
     }
 
