@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.testing;
 
 import android.annotation.SuppressLint;
+import android.os.Environment;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,6 +12,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -30,13 +34,16 @@ public class MotorVariabilityTester extends OpMode {
     private String selectedMotorName = null;
     private DcMotorEx selectedMotor = null;
     private final ElapsedTime motorRuntime = new ElapsedTime();
-    private double motorPower = 0.01;
-    private static final int SAMPLES = 1000;
+    private double motorPower = 0.05;
+    private static final int SAMPLES = 500;
     private final double[] motorVelocitySamples = new double[SAMPLES];
     private final double[] motorCurrentSamples = new double[SAMPLES];
     private int motorSampleIndex = 0;
 
     private final HashMap<Double, MotorPowerResults> motorPowerResults = new HashMap<>();
+
+    private boolean complete = false;
+    private boolean savedResults = false;
 
     private static class MotorPowerResults {
         double velocityMean;
@@ -87,49 +94,72 @@ public class MotorVariabilityTester extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addLine(selectedMotorName);
-        telemetry.addData("Motor Power", motorPower);
-        telemetry.addData("Motor Runtime", motorRuntime.seconds());
+        if (!complete) {
+            telemetry.addLine(selectedMotorName);
+            telemetry.addData("Motor Power", motorPower);
+            telemetry.addData("Motor Runtime", motorRuntime.seconds());
 
-        selectedMotor.setPower(motorPower);
-        if (motorSampleIndex == SAMPLES) {
-            if (motorPower == 1) {
-                selectedMotor.setPower(0);
-                requestOpModeStop();
-            } else {
-                double velocityMean = mean(motorVelocitySamples);
-                double velocityStdDev = standardDeviation(motorVelocitySamples);
-                double currentMean = mean(motorCurrentSamples);
-                double currentStdDev = standardDeviation(motorCurrentSamples);
-                motorPowerResults.put(motorPower, new MotorPowerResults(velocityMean, velocityStdDev, currentMean, currentStdDev));
+            selectedMotor.setPower(motorPower);
+            if (motorSampleIndex == SAMPLES) {
+                if (motorPower == 1) {
+                    selectedMotor.setPower(0);
+                    complete = true;
+                } else {
+                    double velocityMean = mean(motorVelocitySamples);
+                    double velocityStdDev = standardDeviation(motorVelocitySamples);
+                    double currentMean = mean(motorCurrentSamples);
+                    double currentStdDev = standardDeviation(motorCurrentSamples);
+                    motorPowerResults.put(motorPower, new MotorPowerResults(velocityMean, velocityStdDev, currentMean, currentStdDev));
 
-                motorPower = Math.min(motorPower * 2, 1);
-                motorRuntime.reset();
-                motorSampleIndex = 0;
-                Arrays.fill(motorVelocitySamples, 0.0);
-                Arrays.fill(motorCurrentSamples, 0.0);
+                    motorPower = Math.min(motorPower * 2, 1);
+                    motorRuntime.reset();
+                    motorSampleIndex = 0;
+                    Arrays.fill(motorVelocitySamples, 0.0);
+                    Arrays.fill(motorCurrentSamples, 0.0);
+                }
+            } else if (motorRuntime.seconds() > 1) {
+                motorVelocitySamples[motorSampleIndex] = selectedMotor.getVelocity();
+                motorCurrentSamples[motorSampleIndex] = selectedMotor.getCurrent(CurrentUnit.AMPS);
+                motorSampleIndex++;
             }
-        } else if (motorRuntime.seconds() > 1) {
-            motorVelocitySamples[motorSampleIndex] = selectedMotor.getVelocity();
-            motorCurrentSamples[motorSampleIndex] = selectedMotor.getCurrent(CurrentUnit.MILLIAMPS);
-            motorSampleIndex++;
+        } else {
+            if (motors.isEmpty()) {
+                telemetry.addLine("No motors found");
+            } else {
+                if (!savedResults) {
+                    savedResults = true;
+                    saveResults();
+                }
+                telemetry.addData("Results saved", System.getProperty("user.dir"));
+//                telemetry.addLine("Results");
+//                for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
+//                    MotorPowerResults motorPowerResult = entry.getValue();
+//                    telemetry.addLine(entry.getKey().toString() + ": ")
+//                            .addData("velMean", motorPowerResult.velocityMean)
+//                            .addData("velStdDev", motorPowerResult.velocityStdDev)
+//                            .addData("curMean", motorPowerResult.currentMean)
+//                            .addData("curStdDev", motorPowerResult.currentStdDev);
+//                }
+            }
+            telemetry.update();
         }
     }
 
-    @Override
-    public void stop() {
-        if (motors.isEmpty()) {
-            telemetry.addLine("No motors found");
-        } else {
-            telemetry.addLine("Results");
+    @SuppressLint("DefaultLocale")
+    private void saveResults() {
+        try (FileWriter writer = new FileWriter(String.format(Environment.getDataDirectory() + "/motor_results_%tF_%<tT\".csv", java.util.Calendar.getInstance()))) {
+            writer.write("Power,VelMean,VelStdDev,CurMean,CurStdDev\n");
             for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
                 MotorPowerResults motorPowerResult = entry.getValue();
-                telemetry.addLine(entry.getKey().toString())
-                        .addData("velMean", motorPowerResult.velocityMean)
-                        .addData("velStdDev", motorPowerResult.velocityStdDev)
-                        .addData("curMean", motorPowerResult.currentMean)
-                        .addData("curStdDev", motorPowerResult.currentStdDev);
+                writer.write(String.format("%f,%f,%f,%f,%f\n",
+                        entry.getKey(),
+                        motorPowerResult.velocityMean,
+                        motorPowerResult.velocityStdDev,
+                        motorPowerResult.currentMean,
+                        motorPowerResult.currentStdDev));
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
