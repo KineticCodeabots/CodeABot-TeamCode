@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @TeleOp(name = "Motor Variability Tester", group = "Testing")
@@ -28,19 +29,22 @@ public class MotorVariabilityTester extends OpMode {
     );
     private ArrayList<Map.Entry<String, DcMotor>> motors = null;
     private int selectedIndex = 0;
+
     private final Gamepad currentGamepad = new Gamepad();
     private final Gamepad previousGamepad = new Gamepad();
 
     private String selectedMotorName = null;
     private DcMotorEx selectedMotor = null;
+
     private final ElapsedTime motorRuntime = new ElapsedTime();
     private double motorPower = 0.05;
+
     private static final int SAMPLES = 500;
     private final double[] motorVelocitySamples = new double[SAMPLES];
     private final double[] motorCurrentSamples = new double[SAMPLES];
     private int motorSampleIndex = 0;
 
-    private final HashMap<Double, MotorPowerResults> motorPowerResults = new HashMap<>();
+    private final Map<Double, MotorPowerResults> motorPowerResults = new LinkedHashMap<>();
 
     private boolean complete = false;
     private boolean savedResults = false;
@@ -131,15 +135,11 @@ public class MotorVariabilityTester extends OpMode {
                     saveResults();
                 }
                 telemetry.addData("Results saved", System.getProperty("user.dir"));
-//                telemetry.addLine("Results");
-//                for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
-//                    MotorPowerResults motorPowerResult = entry.getValue();
-//                    telemetry.addLine(entry.getKey().toString() + ": ")
-//                            .addData("velMean", motorPowerResult.velocityMean)
-//                            .addData("velStdDev", motorPowerResult.velocityStdDev)
-//                            .addData("curMean", motorPowerResult.currentMean)
-//                            .addData("curStdDev", motorPowerResult.currentStdDev);
-//                }
+                telemetry.addLine("Results\n");
+                for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
+                    MotorPowerResults motorPowerResult = entry.getValue();
+                    telemetry.addData(entry.getKey().toString(), motorPowerResult.velocityStdDev);
+                }
             }
             telemetry.update();
         }
@@ -159,7 +159,7 @@ public class MotorVariabilityTester extends OpMode {
                         motorPowerResult.currentStdDev));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            telemetry.log().add(e.toString());
         }
     }
 
