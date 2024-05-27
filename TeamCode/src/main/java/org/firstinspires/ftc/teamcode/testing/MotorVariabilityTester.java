@@ -14,11 +14,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -132,9 +130,13 @@ public class MotorVariabilityTester extends OpMode {
             } else {
                 if (!savedResults) {
                     savedResults = true;
-                    saveResults();
+                    try {
+                        String resultsFilepath = saveResults();
+                        telemetry.addData("Results saved", resultsFilepath);
+                    } catch (IOException e) {
+                        telemetry.log().add("An error occurred while saving results: " + e.getMessage() + ", Stack Trace: " + Arrays.toString(e.getStackTrace()));
+                    }
                 }
-                telemetry.addData("Results saved", System.getProperty("user.dir"));
                 telemetry.addLine("Results\n");
                 for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
                     MotorPowerResults motorPowerResult = entry.getValue();
@@ -146,8 +148,9 @@ public class MotorVariabilityTester extends OpMode {
     }
 
     @SuppressLint("DefaultLocale")
-    private void saveResults() {
-        try (FileWriter writer = new FileWriter(String.format(Environment.getDataDirectory() + "/motor_results_%tF_%<tT\".csv", java.util.Calendar.getInstance()))) {
+    private String saveResults() throws IOException {
+        String filePath = String.format(Environment.getExternalStorageDirectory() + "/motor_results_%tF_%<tT\".csv", java.util.Calendar.getInstance());
+        try (FileWriter writer = new FileWriter(filePath)) {
             writer.write("Power,VelMean,VelStdDev,CurMean,CurStdDev\n");
             for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
                 MotorPowerResults motorPowerResult = entry.getValue();
@@ -158,9 +161,8 @@ public class MotorVariabilityTester extends OpMode {
                         motorPowerResult.currentMean,
                         motorPowerResult.currentStdDev));
             }
-        } catch (IOException e) {
-            telemetry.log().add(e.toString());
         }
+        return filePath;
     }
 
     private void updateGamepad() {
