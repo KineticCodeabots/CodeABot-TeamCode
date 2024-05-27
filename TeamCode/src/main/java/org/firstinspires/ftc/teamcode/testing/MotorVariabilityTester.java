@@ -14,10 +14,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @TeleOp(name = "Motor Variability Tester", group = "Testing")
@@ -106,19 +109,19 @@ public class MotorVariabilityTester extends OpMode {
                 if (motorPower == 1) {
                     selectedMotor.setPower(0);
                     complete = true;
-                } else {
-                    double velocityMean = mean(motorVelocitySamples);
-                    double velocityStdDev = standardDeviation(motorVelocitySamples);
-                    double currentMean = mean(motorCurrentSamples);
-                    double currentStdDev = standardDeviation(motorCurrentSamples);
-                    motorPowerResults.put(motorPower, new MotorPowerResults(velocityMean, velocityStdDev, currentMean, currentStdDev));
-
-                    motorPower = Math.min(motorPower * 2, 1);
-                    motorRuntime.reset();
-                    motorSampleIndex = 0;
-                    Arrays.fill(motorVelocitySamples, 0.0);
-                    Arrays.fill(motorCurrentSamples, 0.0);
                 }
+
+                double velocityMean = mean(motorVelocitySamples);
+                double velocityStdDev = standardDeviation(motorVelocitySamples);
+                double currentMean = mean(motorCurrentSamples);
+                double currentStdDev = standardDeviation(motorCurrentSamples);
+                motorPowerResults.put(motorPower, new MotorPowerResults(velocityMean, velocityStdDev, currentMean, currentStdDev));
+
+                motorPower = Math.min(motorPower * 2, 1);
+                motorRuntime.reset();
+                motorSampleIndex = 0;
+                Arrays.fill(motorVelocitySamples, 0.0);
+                Arrays.fill(motorCurrentSamples, 0.0);
             } else if (motorRuntime.seconds() > 1) {
                 motorVelocitySamples[motorSampleIndex] = selectedMotor.getVelocity();
                 motorCurrentSamples[motorSampleIndex] = selectedMotor.getCurrent(CurrentUnit.AMPS);
@@ -132,7 +135,7 @@ public class MotorVariabilityTester extends OpMode {
                     savedResults = true;
                     try {
                         String resultsFilepath = saveResults();
-                        telemetry.addData("Results saved", resultsFilepath);
+                        telemetry.log().add("Results saved: %s", resultsFilepath);
                     } catch (IOException e) {
                         telemetry.log().add("An error occurred while saving results: " + e.getMessage() + ", Stack Trace: " + Arrays.toString(e.getStackTrace()));
                     }
@@ -143,13 +146,15 @@ public class MotorVariabilityTester extends OpMode {
                     telemetry.addData(entry.getKey().toString(), motorPowerResult.velocityStdDev);
                 }
             }
-            telemetry.update();
         }
     }
 
     @SuppressLint("DefaultLocale")
     private String saveResults() throws IOException {
-        String filePath = String.format(Environment.getExternalStorageDirectory() + "/motor_results_%tF_%<tT\".csv", java.util.Calendar.getInstance());
+        Date now = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmm", Locale.US);
+        String formattedDateTime = formatter.format(now);
+        String filePath = Environment.getExternalStorageDirectory() + String.format("/motor_results_%s.csv", formattedDateTime);
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write("Power,VelMean,VelStdDev,CurMean,CurStdDev\n");
             for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
