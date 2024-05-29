@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -28,29 +27,29 @@ public class MotorVariabilityTester extends OpMode {
     private static final Comparator<Map.Entry<String, DcMotor>> motorComparator = Comparator.comparing(
             entry -> entry.getValue().getPortNumber()
     );
-    private ArrayList<Map.Entry<String, DcMotor>> motors = null;
+    protected ArrayList<Map.Entry<String, DcMotor>> motors = null;
     private int selectedIndex = 0;
 
     private final Gamepad currentGamepad = new Gamepad();
     private final Gamepad previousGamepad = new Gamepad();
 
-    private String selectedMotorName = null;
-    private DcMotorEx selectedMotor = null;
+    protected String selectedMotorName = null;
+    protected DcMotorEx selectedMotor = null;
 
-    private final ElapsedTime motorRuntime = new ElapsedTime();
-    private double motorPower = 0.05;
+    protected final ElapsedTime motorRuntime = new ElapsedTime();
+    protected double motorPower = 0.5;
 
-    private static final int SAMPLES = 500;
-    private final double[] motorVelocitySamples = new double[SAMPLES];
-    private final double[] motorCurrentSamples = new double[SAMPLES];
-    private int motorSampleIndex = 0;
+    protected static final int SAMPLES = 5000;
+    protected final double[] motorVelocitySamples = new double[SAMPLES];
+    protected final double[] motorCurrentSamples = new double[SAMPLES];
+    protected int motorSampleIndex = 0;
 
-    private final Map<Double, MotorPowerResults> motorPowerResults = new LinkedHashMap<>();
+    private MotorPowerResults results = null;
 
-    private boolean complete = false;
-    private boolean savedResults = false;
+    protected boolean complete = false;
+    protected boolean savedResults = false;
 
-    private static class MotorPowerResults {
+    public static class MotorPowerResults {
         double velocityMean;
         double velocityStdDev;
         double currentMean;
@@ -100,82 +99,81 @@ public class MotorVariabilityTester extends OpMode {
     @Override
     public void loop() {
         if (!complete) {
-            telemetry.addLine(selectedMotorName);
-            telemetry.addData("Motor Power", motorPower);
-            telemetry.addData("Motor Runtime", motorRuntime.seconds());
-
-            selectedMotor.setPower(motorPower);
-            if (motorSampleIndex == SAMPLES) {
-                if (motorPower == 1) {
-                    selectedMotor.setPower(0);
-                    complete = true;
-                }
-
-                double velocityMean = mean(motorVelocitySamples);
-                double velocityStdDev = standardDeviation(motorVelocitySamples);
-                double currentMean = mean(motorCurrentSamples);
-                double currentStdDev = standardDeviation(motorCurrentSamples);
-                motorPowerResults.put(motorPower, new MotorPowerResults(velocityMean, velocityStdDev, currentMean, currentStdDev));
-
-                motorPower = Math.min(motorPower * 2, 1);
-                motorRuntime.reset();
-                motorSampleIndex = 0;
-                Arrays.fill(motorVelocitySamples, 0.0);
-                Arrays.fill(motorCurrentSamples, 0.0);
-            } else if (motorRuntime.seconds() > 1) {
-                motorVelocitySamples[motorSampleIndex] = selectedMotor.getVelocity();
-                motorCurrentSamples[motorSampleIndex] = selectedMotor.getCurrent(CurrentUnit.AMPS);
-                motorSampleIndex++;
-            }
+            runtime_loop();
         } else {
-            if (motors.isEmpty()) {
-                telemetry.addLine("No motors found");
-            } else {
-                if (!savedResults) {
-                    savedResults = true;
-                    try {
-                        String resultsFilepath = saveResults();
-                        telemetry.log().add("Results saved: %s", resultsFilepath);
-                    } catch (IOException e) {
-                        telemetry.log().add("An error occurred while saving results: " + e.getMessage() + ", Stack Trace: " + Arrays.toString(e.getStackTrace()));
-                    }
-                }
-                telemetry.addLine("Results\n");
-                for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
-                    MotorPowerResults motorPowerResult = entry.getValue();
-                    telemetry.addData(entry.getKey().toString(), motorPowerResult.velocityStdDev);
+            complete_loop();
+        }
+    }
+
+    protected void runtime_loop() {
+        telemetry.addLine(selectedMotorName);
+        telemetry.addData("Motor Power", motorPower);
+        telemetry.addData("Motor Runtime", motorRuntime.seconds());
+
+        selectedMotor.setPower(motorPower);
+        if (motorSampleIndex == SAMPLES) {
+            double velocityMean = mean(motorVelocitySamples);
+            double velocityStdDev = standardDeviation(motorVelocitySamples);
+            double currentMean = mean(motorCurrentSamples);
+            double currentStdDev = standardDeviation(motorCurrentSamples);
+            results = new MotorPowerResults(velocityMean, velocityStdDev, currentMean, currentStdDev);
+
+            selectedMotor.setPower(0);
+            complete = true;
+            motorRuntime.reset();
+            motorSampleIndex = 0;
+            Arrays.fill(motorVelocitySamples, 0.0);
+            Arrays.fill(motorCurrentSamples, 0.0);
+        } else if (motorRuntime.seconds() > 1) {
+            double velocity = selectedMotor.getVelocity();
+            double current = selectedMotor.getCurrent(CurrentUnit.AMPS);
+            telemetry.addData("Velocity", velocity);
+            telemetry.addData("Current", current);
+            motorVelocitySamples[motorSampleIndex] = velocity;
+            motorCurrentSamples[motorSampleIndex] = current;
+            motorSampleIndex++;
+        }
+    }
+
+    protected void complete_loop() {
+        if (motors.isEmpty()) {
+            telemetry.addLine("No motors found");
+        } else {
+            if (!savedResults) {
+                savedResults = true;
+                try {
+                    String resultsFilepath = saveResults();
+                    telemetry.log().add("Results saved: %s", resultsFilepath);
+                } catch (IOException e) {
+                    telemetry.log().add("An error occurred while saving results: " + e.getMessage() + ", Stack Trace: " + Arrays.toString(e.getStackTrace()));
                 }
             }
+            telemetry.addLine("Results:");
+            telemetry.addData("Velocity Mean", results.velocityMean);
+            telemetry.addData("Velocity StdDev", results.velocityStdDev);
+            telemetry.addData("Current Mean", results.currentMean);
+            telemetry.addData("Current StdDev", results.currentStdDev);
         }
     }
 
     @SuppressLint("DefaultLocale")
-    private String saveResults() throws IOException {
+    protected String saveResults() throws IOException {
         Date now = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmm", Locale.US);
         String formattedDateTime = formatter.format(now);
         String filePath = Environment.getExternalStorageDirectory() + String.format("/motor_results_%s.csv", formattedDateTime);
         try (FileWriter writer = new FileWriter(filePath)) {
-            writer.write("Power,VelMean,VelStdDev,CurMean,CurStdDev\n");
-            for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {
-                MotorPowerResults motorPowerResult = entry.getValue();
-                writer.write(String.format("%f,%f,%f,%f,%f\n",
-                        entry.getKey(),
-                        motorPowerResult.velocityMean,
-                        motorPowerResult.velocityStdDev,
-                        motorPowerResult.currentMean,
-                        motorPowerResult.currentStdDev));
-            }
+            writer.write(String.format("%f\n%f\n%f\n%f\n%f\n", motorPower, results.velocityMean, results.velocityStdDev, results.currentMean, results.currentStdDev));
         }
         return filePath;
     }
 
-    private void updateGamepad() {
+    protected void updateGamepad() {
         previousGamepad.copy(currentGamepad);
         currentGamepad.copy(gamepad1);
     }
 
-    private static double sum(double[] numbers) {
+    protected static double sum(double[] numbers) {
         double sum = 0;
         for (double number : numbers) {
             sum += number;
@@ -183,17 +181,17 @@ public class MotorVariabilityTester extends OpMode {
         return sum;
     }
 
-    private static double mean(double[] numbers) {
+    protected static double mean(double[] numbers) {
         return sum(numbers) / numbers.length;
     }
 
-    private static double standardDeviation(double[] numbers) {
+    protected static double standardDeviation(double[] numbers) {
         double mean = mean(numbers);
         double sum = 0;
         for (double number : numbers) {
-            double difference = number - mean;
-            sum += difference * difference;
+            double difference = Math.abs(number - mean);
+            sum += difference;
         }
-        return Math.sqrt(sum / numbers.length);
+        return sum / numbers.length;
     }
 }
