@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.testing;
 
 import android.annotation.SuppressLint;
-import android.os.Environment;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -19,6 +18,12 @@ import java.util.Map;
 @TeleOp(name = "Motor Multi Variability Tester", group = "Testing")
 public class MotorMultiVariabilityTester extends MotorVariabilityTester {
     private final Map<Double, MotorPowerResults> motorPowerResults = new LinkedHashMap<>();
+
+    MotorMultiVariabilityTester() {
+        super();
+        motorPower = 0.05;
+        SAMPLES = 2000;
+    }
 
     @Override
     protected void runtime_loop() {
@@ -79,7 +84,7 @@ public class MotorMultiVariabilityTester extends MotorVariabilityTester {
         Date now = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmm", Locale.US);
         String formattedDateTime = formatter.format(now);
-        String filePath = Environment.getExternalStorageDirectory() + String.format("/motor_results_%s.csv", formattedDateTime);
+        String filePath = createResultsFolder() + String.format("/motor_multi_results_%s.csv", formattedDateTime);
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write("Power,VelMean,VelStdDev,CurMean,CurStdDev\n");
             for (Map.Entry<Double, MotorPowerResults> entry : motorPowerResults.entrySet()) {

@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -39,7 +40,7 @@ public class MotorVariabilityTester extends OpMode {
     protected final ElapsedTime motorRuntime = new ElapsedTime();
     protected double motorPower = 0.5;
 
-    protected static final int SAMPLES = 5000;
+    protected int SAMPLES = 5000;
     protected final double[] motorVelocitySamples = new double[SAMPLES];
     protected final double[] motorCurrentSamples = new double[SAMPLES];
     protected int motorSampleIndex = 0;
@@ -156,12 +157,20 @@ public class MotorVariabilityTester extends OpMode {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    protected String createResultsFolder() throws SecurityException {
+        String folderPath = Environment.getExternalStorageDirectory() + "/motor_variability_results";
+        File dir = new File(folderPath);
+        if (!dir.exists()) dir.mkdirs();
+        return folderPath;
+    }
+
     @SuppressLint("DefaultLocale")
     protected String saveResults() throws IOException {
         Date now = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmm", Locale.US);
         String formattedDateTime = formatter.format(now);
-        String filePath = Environment.getExternalStorageDirectory() + String.format("/motor_results_%s.csv", formattedDateTime);
+        String filePath = createResultsFolder() + String.format("/motor_results_%s.csv", formattedDateTime);
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write(String.format("%f\n%f\n%f\n%f\n%f\n", motorPower, results.velocityMean, results.velocityStdDev, results.currentMean, results.currentStdDev));
         }
