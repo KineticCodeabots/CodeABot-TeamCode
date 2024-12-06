@@ -15,6 +15,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp(name = "TeleOp Mode")
 public class TeleOpMode extends OpMode {
+    final double ARM_MAX_POWER = 0.5;
+    final double LIFT_MAX_POWER = 0.5;
+
     DcMotor armMotor = null;
     DcMotor liftMotor = null;
     Servo claw = null;
@@ -68,14 +71,14 @@ public class TeleOpMode extends OpMode {
 
         // update_drive();
 
-        armMotor.setPower(gamepad1.left_stick_y);
+        armMotor.setPower(gamepad1.left_stick_y * ARM_MAX_POWER);
 //        claw.setPower(gamepad1.right_stick_y);
-        liftMotor.setPower(gamepad1.right_stick_y);
+        liftMotor.setPower(gamepad1.right_stick_y * LIFT_MAX_POWER);
         telemetry.addData("Status", "Running");
-        if (claw.getPosition() == 0) {
-            claw.setPosition(0.5);
+        if (currentGamepad1.cross && !previosGamepad1.cross) {
+            if (claw.getPosition() == 0) claw.setPosition(0.5);
+            else claw.setPosition(0);
         }
-
     }
 
     void update_drive() {
