@@ -13,10 +13,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
-@TeleOp(name = "TeleOp Mode")
+@TeleOp(name = "TeleOp")
 public class TeleOpMode extends OpMode {
     final double ARM_MAX_POWER = 0.5;
     final double LIFT_MAX_POWER = 0.5;
+    final double MAX_DRIVE_SPEED = 0.3;
 
     DcMotor armMotor = null;
     DcMotor liftMotor = null;
@@ -28,13 +29,15 @@ public class TeleOpMode extends OpMode {
     IMU imu = null;
     Gamepad currentGamepad1 = new Gamepad();
     Gamepad currentGamepad2 = new Gamepad();
-
     Gamepad previosGamepad1 = new Gamepad();
     Gamepad previosGamepad2 = new Gamepad();
+
+    boolean clawOpened = true;
 
 
     @Override
     public void init() {
+        // TODO: seperate robot class
         telemetry.addData("Status", "Initialized");
         armMotor = hardwareMap.get(DcMotor.class, "armMotor");
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -62,50 +65,46 @@ public class TeleOpMode extends OpMode {
 
     @Override
     public void loop() {
-
-
         previosGamepad1.copy(currentGamepad1);
         previosGamepad2.copy(currentGamepad2);
         currentGamepad1.copy(gamepad1);
         currentGamepad2.copy(gamepad2);
 
-        // update_drive();
+        update_drive();
 
-        armMotor.setPower(gamepad1.left_stick_y * ARM_MAX_POWER);
-//        claw.setPower(gamepad1.right_stick_y);
-        liftMotor.setPower(gamepad1.right_stick_y * LIFT_MAX_POWER);
+        armMotor.setPower(gamepad2.left_stick_y * ARM_MAX_POWER);
+        // TODO: preset arm positions
+        // TODO: arm current warning
+        // TODO: lift presets
+        liftMotor.setPower(gamepad2.right_stick_y * LIFT_MAX_POWER);
         telemetry.addData("Status", "Running");
-        if (currentGamepad1.cross && !previosGamepad1.cross) {
-            if (claw.getPosition() == 0) claw.setPosition(0.5);
-            else claw.setPosition(0);
+        if (currentGamepad2.cross && !previosGamepad2.cross) {
+            if (clawOpened) {
+                claw.setPosition(0.4);
+                clawOpened = false;
+            } else {
+                claw.setPosition(0.1);
+                clawOpened = true;
+            }
         }
+        telemetry.addData("Claw Position", claw.getPosition());
+        // TODO: telemetry
+
     }
 
     void update_drive() {
-        double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
-
-        if (gamepad1.options) {
-            imu.resetYaw();
-        }
-
-        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-        // Rotate the movement direction counter to the bot's rotation
-        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
-
-        rotX = rotX * 1.1;  // Counteract imperfect strafing
+        double y = -gamepad1.left_stick_y * MAX_DRIVE_SPEED; // Remember, Y stick value is reversed
+        double x = gamepad1.left_stick_x * 1.1 * MAX_DRIVE_SPEED; // Counteract imperfect strafing
+        double rx = gamepad1.right_stick_x * MAX_DRIVE_SPEED;
 
         // Denominator is the largest motor power (absolute value) or 1
         // This ensures all the powers maintain the same ratio,
         // but only if at least one is out of the range [-1, 1]
-        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-        double frontLeftPower = (rotY + rotX + rx) / denominator;
-        double backLeftPower = (rotY - rotX + rx) / denominator;
-        double frontRightPower = (rotY - rotX - rx) / denominator;
-        double backRightPower = (rotY + rotX - rx) / denominator;
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double frontLeftPower = (y + x + rx) / denominator;
+        double backLeftPower = (y - x + rx) / denominator;
+        double frontRightPower = (y - x - rx) / denominator;
+        double backRightPower = (y + x - rx) / denominator;
 
         leftFrontMotor.setPower(frontLeftPower);
         leftBackMotor.setPower(backLeftPower);
