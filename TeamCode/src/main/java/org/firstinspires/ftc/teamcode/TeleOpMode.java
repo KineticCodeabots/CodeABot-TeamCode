@@ -21,7 +21,13 @@ public class TeleOpMode extends GamepadOpMode {
     public void loop() {
         updateGamepads();
 
-        robot.updateMecanumRobotDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+//        robot.updateMecanumRobotDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+        if (gamepad1.options) {
+            robot.imu.resetYaw();
+        }
+        
+        robot.updateMecanumFieldDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+
 
         robot.armMotor.setPower(gamepad2.left_stick_y * Robot.ARM_MAX_POWER);
         // TODO: preset arm positions
