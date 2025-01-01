@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -21,7 +22,7 @@ public class Robot {
     public static double CLAW_OPEN_POSITION = 0.1;
     public static double CLAW_CLOSED_POSITION = 0.4;
 
-    public DcMotor armMotor = null;
+    public DcMotorEx armMotor = null;
     public DcMotor liftMotor = null;
     public Servo claw = null;
     public DcMotor frontRightMotor = null;
@@ -53,7 +54,7 @@ public class Robot {
         this.telemetry = opMode.telemetry;
         this.hardwareMap = opMode.hardwareMap;
 
-        armMotor = hardwareMap.get(DcMotor.class, "armMotor");
+        armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
@@ -75,6 +76,7 @@ public class Robot {
         claw = hardwareMap.get(Servo.class, "clawServo");
 
         imu = hardwareMap.get(IMU.class, "imu");
+        // TODO: configure imu correctly
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP));
