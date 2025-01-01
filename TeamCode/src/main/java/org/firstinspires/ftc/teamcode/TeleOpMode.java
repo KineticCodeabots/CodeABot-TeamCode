@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "TeleOp")
 @Config
@@ -25,14 +26,19 @@ public class TeleOpMode extends GamepadOpMode {
         if (gamepad1.options) {
             robot.imu.resetYaw();
         }
-        
+
         robot.updateMecanumFieldDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
+        double armCommand = gamepad2.left_stick_y * Robot.ARM_MAX_POWER;
+        if (armCommand == 0) {
+            // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
+            robot.armMotor.setPower(Range.clip(0 - robot.armMotor.getVelocity() * 0.0001, -0.3, 0.3));
+        } else {
+            robot.armMotor.setPower(armCommand);
+        }
 
-        robot.armMotor.setPower(gamepad2.left_stick_y * Robot.ARM_MAX_POWER);
-        // TODO: preset arm positions
         // TODO: arm current warning
-        // TODO: lift presets
+        // TODO: lift limits
         robot.liftMotor.setPower(gamepad2.right_stick_y * Robot.LIFT_MAX_POWER);
         telemetry.addData("Status", "Running");
         if (currentGamepad2.cross && !previousGamepad1.cross) {
