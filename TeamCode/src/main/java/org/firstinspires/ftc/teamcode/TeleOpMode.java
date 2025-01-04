@@ -57,7 +57,6 @@ public class TeleOpMode extends GamepadOpMode {
 
         if (armCommand == 0) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
-            // also limits velocity supplied to prevent high initial force
             double armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 200));
 
             robot.armMotor.setPower(armSlowdown);
