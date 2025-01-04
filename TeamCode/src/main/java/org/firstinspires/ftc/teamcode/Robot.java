@@ -18,6 +18,7 @@ public class Robot {
     // TODO: better config system
     public static double ARM_MAX_POWER = 0.4;
     public static double LIFT_MAX_POWER = 1;
+    public static int LIFT_MAX_POSITION = 600;
 
     public static double CLAW_OPEN_POSITION = 0.1;
     public static double CLAW_CLOSED_POSITION = 0.4;
@@ -59,7 +60,10 @@ public class Robot {
 
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         frontRightMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
         backRightMotor = hardwareMap.get(DcMotor.class, "rightBackMotor");
