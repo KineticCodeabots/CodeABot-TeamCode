@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
@@ -14,12 +16,14 @@ public class TeleOpMode extends GamepadOpMode {
     public static double CROUCH_SPEED = 0.2;
 
     private final Robot robot = new Robot(this);
-    private final PID armSlowdownPID = new PID(0, 0.00001, 0.000001);
+    private final PID armSlowdownPID = new PID(0, 0.00001, 0);
 
     private boolean crouching = false;
 
     @Override
     public void init() {
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         telemetry.addData("Status", "Initializing");
         telemetry.update();
         robot.init();
@@ -29,9 +33,9 @@ public class TeleOpMode extends GamepadOpMode {
 
     @Override
     public void loop() {
+        telemetry.addData("Status", "Running");
         updateGamepads();
 
-//        robot.updateMecanumRobotDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
         if (gamepad1.options) {
             robot.imu.resetYaw();
         }
@@ -45,15 +49,17 @@ public class TeleOpMode extends GamepadOpMode {
         if (crouching) {
             driveFactor = CROUCH_SPEED;
             turnFactor = turnFactor * 0.5;
-        } else if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+        } else if (currentGamepad1.right_bumper) {
             driveFactor = 1;
         }
         robot.updateMecanumFieldDrive(-gamepad1.left_stick_y * driveFactor, gamepad1.left_stick_x * driveFactor, gamepad1.right_stick_x * turnFactor);  // TODO: should I add option to switch between field and robot centric?
         double armCommand = gamepad2.left_stick_y * Robot.ARM_MAX_POWER;
-//        robot.armMotor.setPower(armCommand);
+
         if (armCommand == 0) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
-            double armSlowdown = armSlowdownPID.update(0, robot.armMotor.getVelocity());
+            // also limits velocity supplied to prevent high initial force
+            double armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 200));
+
             robot.armMotor.setPower(armSlowdown);
         } else {
             armSlowdownPID.reset();
@@ -62,8 +68,8 @@ public class TeleOpMode extends GamepadOpMode {
 
         // TODO: arm current warning
         // TODO: lift limits
-        robot.liftMotor.setPower(gamepad2.right_stick_y * Robot.LIFT_MAX_POWER);
-        telemetry.addData("Status", "Running");
+        robot.liftMotor.setPower(-gamepad2.right_stick_y * Robot.LIFT_MAX_POWER);
+
         if (currentGamepad2.cross && !previousGamepad2.cross) {
             robot.toggleClaw();
         }
