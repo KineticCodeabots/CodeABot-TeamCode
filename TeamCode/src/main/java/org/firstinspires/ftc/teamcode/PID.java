@@ -7,9 +7,9 @@ public class PID {
     protected double Ki;
     protected double Kd;
 
-    protected double lastReference = 0;
-    protected double integralSum = 0;
-    protected double lastError = 0;
+    public double lastReference = 0;
+    public double integralSum = 0;
+    public double lastError = 0;
 
     ElapsedTime timer = new ElapsedTime();
 
@@ -20,8 +20,6 @@ public class PID {
     }
 
     public double update(double reference, double state) {
-        if (Math.signum(lastReference) != Math.signum(reference) || reference == 0) integralSum = 0;
-
         double error = reference - state;
         double derivative = (error - lastError) / timer.seconds();
         integralSum = integralSum + (error * timer.seconds());
