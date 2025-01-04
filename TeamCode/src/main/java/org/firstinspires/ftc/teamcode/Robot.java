@@ -16,10 +16,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 public class Robot {
     // TODO: better config system
-    public static double ARM_MAX_POWER = 0.3;
-    public static double LIFT_MAX_POWER = 0.5;
-    public static double MAX_DRIVE_SPEED = 0.3;
-    public static double MAX_TURN_SPEED = 0.3;
+    public static double ARM_MAX_POWER = 0.4;
+    public static double LIFT_MAX_POWER = 1;
+
     public static double CLAW_OPEN_POSITION = 0.1;
     public static double CLAW_CLOSED_POSITION = 0.4;
 
@@ -106,9 +105,9 @@ public class Robot {
     }
 
     void updateMecanumFieldDrive(double drive, double strafe, double turn) {
-        double y = drive * MAX_DRIVE_SPEED;
-        double x = strafe * MAX_DRIVE_SPEED;
-        double rx = turn * MAX_TURN_SPEED;
+        double y = drive;
+        double x = strafe;
+        double rx = turn;
 
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
