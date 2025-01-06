@@ -11,12 +11,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp(name = "TeleOp")
 @Config
 public class TeleOpMode extends GamepadOpMode {
+    public static double ARM_MAX_POWER = 0.6;
     public static double MAX_DRIVE_SPEED = 0.5;
     public static double MAX_TURN_SPEED = 0.4;
     public static double CROUCH_SPEED = 0.2;
 
     private final Robot robot = new Robot(this);
-    private final PID armSlowdownPID = new PID(0, 0.00001, 0);
+    private final PID armSlowdownPID = new PID(0, 0.00005, 0.000001);
 
     private boolean crouching = false;
 
@@ -51,13 +52,25 @@ public class TeleOpMode extends GamepadOpMode {
             turnFactor = turnFactor * 0.5;
         } else if (currentGamepad1.right_bumper) {
             driveFactor = 1;
+            turnFactor = 1;
         }
         robot.updateMecanumFieldDrive(-gamepad1.left_stick_y * driveFactor, gamepad1.left_stick_x * driveFactor, gamepad1.right_stick_x * turnFactor);  // TODO: should I add option to switch between field and robot centric?
-        double armCommand = gamepad2.left_stick_y * Robot.ARM_MAX_POWER;
+        double armCommand = Range.scale(-gamepad2.left_stick_y * ARM_MAX_POWER, 0.3, 1, 0, 1);
+        if (armCommand < 0) {
+            armCommand = armCommand * 0.2;
+        }
+        telemetry.addData("Arm Command", armCommand);
 
         if (armCommand == 0) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
-            double armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 200));
+            double armSlowdown;
+//            if (Math.abs(robot.armMotor.getVelocity()) > 300) {
+//                armSlowdown = 0;
+//            } else {
+//                armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -100, 100));
+//            }
+            armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -100, 100));
+            telemetry.addData("Arm Slowdown", armSlowdown);
 
             robot.armMotor.setPower(armSlowdown);
         } else {

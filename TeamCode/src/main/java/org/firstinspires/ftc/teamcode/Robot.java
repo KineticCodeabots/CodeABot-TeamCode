@@ -16,7 +16,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 public class Robot {
     // TODO: better config system
-    public static double ARM_MAX_POWER = 0.4;
     public static double LIFT_MAX_POWER = 1;
     public static int LIFT_MAX_POSITION = 600;
 
@@ -57,6 +56,9 @@ public class Robot {
 
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -72,10 +74,6 @@ public class Robot {
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         claw = hardwareMap.get(Servo.class, "clawServo");
 
