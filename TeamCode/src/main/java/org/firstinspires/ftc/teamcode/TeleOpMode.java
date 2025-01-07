@@ -54,7 +54,7 @@ public class TeleOpMode extends GamepadOpMode {
             driveFactor = 1;
             turnFactor = 1;
         }
-        robot.updateMecanumFieldDrive(-gamepad1.left_stick_y * driveFactor, gamepad1.left_stick_x * driveFactor, gamepad1.right_stick_x * turnFactor);  // TODO: should I add option to switch between field and robot centric?
+        robot.updateMecanumFieldDrive(-gamepad1.left_stick_y * driveFactor, gamepad1.left_stick_x * driveFactor, gamepad1.right_stick_x * turnFactor);
         double armCommand = Range.scale(-gamepad2.left_stick_y * ARM_MAX_POWER, 0.3, 1, 0, 1);
         if (armCommand < 0) {
             armCommand = armCommand * 0.2;
@@ -64,16 +64,16 @@ public class TeleOpMode extends GamepadOpMode {
         if (armCommand == 0) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
             double armSlowdown;
-//            if (Math.abs(robot.armMotor.getVelocity()) > 300) {
-//                armSlowdown = 0;
-//            } else {
-//                armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -100, 100));
-//            }
-            armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -100, 100));
+            if (Math.abs(robot.armMotor.getVelocity()) > 300) {
+                armSlowdown = 0;
+            } else {
+                armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -50, 50));
+            }
             telemetry.addData("Arm Slowdown", armSlowdown);
 
             robot.armMotor.setPower(armSlowdown);
         } else {
+            telemetry.addData("Arm Slowdown", 0);
             armSlowdownPID.reset();
             robot.armMotor.setPower(armCommand);
         }
