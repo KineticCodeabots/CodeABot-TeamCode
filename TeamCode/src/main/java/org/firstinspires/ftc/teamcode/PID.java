@@ -24,6 +24,7 @@ public class PID {
         double derivative = (error - lastError) / timer.seconds();
         integralSum = integralSum + (error * timer.seconds());
         lastReference = reference;
+        timer.reset();
         return (Kp * error) + (Ki * integralSum) + (Kd * derivative);
     }
 
