@@ -31,6 +31,7 @@ public class TeleOpMode extends GamepadOpMode {
             );
 
     private final Robot robot = new Robot(this);
+    private final PID armSlowdownPID = new PID(0, 0.002, 0.00001);
     private final PID armSlowdownPID = new PID(0, 0.00005, 0.000001);
     private final PID liftPositionPID = new PIDAW(0.000001, 0.00001, 0);
     private boolean liftMoveToPosition = false;
@@ -67,12 +68,12 @@ public class TeleOpMode extends GamepadOpMode {
 
         double driveFactor = MAX_DRIVE_SPEED;
         double turnFactor = MAX_TURN_SPEED;
-        if (precisionDriving) {
-            driveFactor = CROUCH_SPEED;
-            turnFactor = turnFactor * 0.5;
-        } else if (currentGamepad1.right_bumper) {
+        if (currentGamepad1.right_bumper) {
             driveFactor = 1;
             turnFactor = 1;
+        } else if (precisionDriving) {
+            driveFactor = CROUCH_SPEED;
+            turnFactor = turnFactor * 0.5;
         }
         if (currentGamepad1.share && !previousGamepad1.share) {
             fieldCentric = !fieldCentric;
@@ -92,10 +93,10 @@ public class TeleOpMode extends GamepadOpMode {
         if (armCommand == 0) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
             double armSlowdown;
-            if (Math.abs(robot.armMotor.getVelocity()) > 300) {
+            if (Math.abs(robot.armMotor.getVelocity()) > 500) {
                 armSlowdown = 0;
             } else {
-                armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -50, 50));
+                armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 50));
             }
             telemetry.addData("Arm Slowdown", armSlowdown);
 
