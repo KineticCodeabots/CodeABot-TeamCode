@@ -16,7 +16,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 public class Robot {
     // TODO: better config system
-    public static double LIFT_MAX_POWER = 1;
     public static int LIFT_MAX_POSITION = 600;
 
     public static double CLAW_OPEN_POSITION = 0.1;
@@ -64,7 +63,7 @@ public class Robot {
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // TODO: test without using this
 
 
         frontRightMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
