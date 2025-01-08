@@ -32,7 +32,6 @@ public class TeleOpMode extends GamepadOpMode {
 
     private final Robot robot = new Robot(this);
     private final PID armSlowdownPID = new PID(0, 0.002, 0.00001);
-    private final PID armSlowdownPID = new PID(0, 0.00005, 0.000001);
     private final PID liftPositionPID = new PIDAW(0.000001, 0.00001, 0);
     private boolean liftMoveToPosition = false;
     private int liftTargetPosition = 0;
