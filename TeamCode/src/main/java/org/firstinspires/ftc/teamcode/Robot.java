@@ -61,7 +61,7 @@ public class Robot {
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // TODO: test without using this
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // TODO: test without using this
 
 
         frontRightMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
@@ -75,7 +75,6 @@ public class Robot {
         claw = hardwareMap.get(Servo.class, "clawServo");
 
         imu = hardwareMap.get(IMU.class, "imu");
-        // TODO: configure imu correctly
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
