@@ -23,6 +23,7 @@ public class PID {
         double error = reference - state;
         double derivative = (error - lastError) / timer.seconds();
         integralSum = integralSum + (error * timer.seconds());
+        lastReference = reference;
         return (Kp * error) + (Ki * integralSum) + (Kd * derivative);
     }
 
