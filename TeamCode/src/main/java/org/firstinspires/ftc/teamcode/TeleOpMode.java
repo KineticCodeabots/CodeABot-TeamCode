@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -104,6 +105,11 @@ public class TeleOpMode extends GamepadOpMode {
     }
 
     private void armLoop() {
+        if (currentGamepad2.left_stick_button && !previousGamepad2.left_stick_button) {
+            robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+
         double armCommand = -gamepad2.left_stick_y * ARM_MAX_POWER;
         if (armCommand < 0) {
             armCommand = armCommand * 0.3;
@@ -133,6 +139,11 @@ public class TeleOpMode extends GamepadOpMode {
     }
 
     private void liftLoop() {
+        if (currentGamepad2.right_stick_button && !previousGamepad2.right_stick_button) {
+            robot.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+
         double armAngleRadians = (robot.armMotor.getCurrentPosition() / ARM_TICKS_PER_REV * 2 * Math.PI) + ARM_ANGLE_OFFSET;  // TODO: angle estimation
         double cosine = Math.cos(armAngleRadians);
         double maxLiftLength = Math.max(MAX_LIFT_POSITION_HORIZONTAL / cosine, 0);
