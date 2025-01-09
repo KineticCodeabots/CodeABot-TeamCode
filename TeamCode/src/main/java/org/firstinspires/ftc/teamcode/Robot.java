@@ -21,7 +21,7 @@ public class Robot {
     public static DcMotor.ZeroPowerBehavior DRIVE_MOTOR_ZERO_POWER = DcMotor.ZeroPowerBehavior.BRAKE;
 
     public DcMotorEx armMotor = null;
-    public DcMotor liftMotor = null;
+    public DcMotorEx liftMotor = null;
     public Servo claw = null;
     public DcMotor frontRightMotor = null;
     public DcMotor frontLeftMotor = null;
@@ -58,7 +58,7 @@ public class Robot {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
+        liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
