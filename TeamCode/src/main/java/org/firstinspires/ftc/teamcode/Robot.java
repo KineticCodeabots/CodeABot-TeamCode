@@ -18,6 +18,7 @@ public class Robot {
     // TODO: better config system
     public static double CLAW_OPEN_POSITION = 0.1;
     public static double CLAW_CLOSED_POSITION = 0.4;
+    public static DcMotor.ZeroPowerBehavior DRIVE_MOTOR_ZERO_POWER = DcMotor.ZeroPowerBehavior.BRAKE;
 
     public DcMotorEx armMotor = null;
     public DcMotor liftMotor = null;
@@ -61,8 +62,7 @@ public class Robot {
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // TODO: test without using this
-
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         frontRightMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
         backRightMotor = hardwareMap.get(DcMotor.class, "rightBackMotor");
@@ -70,7 +70,10 @@ public class Robot {
         frontLeftMotor = hardwareMap.get(DcMotor.class, "leftFrontMotor");
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        frontRightMotor.setZeroPowerBehavior(DRIVE_MOTOR_ZERO_POWER);
+        backRightMotor.setZeroPowerBehavior(DRIVE_MOTOR_ZERO_POWER);
+        frontLeftMotor.setZeroPowerBehavior(DRIVE_MOTOR_ZERO_POWER);
+        backLeftMotor.setZeroPowerBehavior(DRIVE_MOTOR_ZERO_POWER);
 
         claw = hardwareMap.get(Servo.class, "clawServo");
 
