@@ -47,6 +47,7 @@ public class TeleOpMode extends GamepadOpMode {
         telemetry.update();
         robot.init();
         robot.armMotor.setCurrentAlert(5, CurrentUnit.AMPS);
+        robot.liftMotor.setCurrentAlert(5, CurrentUnit.AMPS);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
@@ -199,5 +200,9 @@ public class TeleOpMode extends GamepadOpMode {
 
         telemetry.addData("Max Lift Length", maxLiftLength);
         telemetry.addData("Lift Position", robot.liftMotor.getCurrentPosition());
+
+        if (robot.liftMotor.isOverCurrent()) {
+            telemetry.addLine("LIFT MOTOR EXCEEDED CURRENT LIMIT!");
+        }
     }
 }
