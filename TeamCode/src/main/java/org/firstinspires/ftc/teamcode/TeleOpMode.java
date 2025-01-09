@@ -17,8 +17,8 @@ public class TeleOpMode extends GamepadOpMode {
     public static double MAX_DRIVE_SPEED = 0.5;
     public static double MAX_TURN_SPEED = 0.4;
     public static double CROUCH_SPEED = 0.2;
-    public static int MAX_LIFT_POSITION = 1700;
-    public static int MAX_LIFT_POSITION_HORIZONTAL = 1300;
+    public static int MAX_LIFT_POSITION = 1900;
+    public static int MAX_LIFT_POSITION_HORIZONTAL = 1600;
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
 
@@ -112,15 +112,17 @@ public class TeleOpMode extends GamepadOpMode {
             robot.toggleClaw();
         }
 
-        if (currentGamepad2.y && !previousGamepad1.y) {
-            liftMoveToPosition = true;
-            liftTargetPosition = MAX_LIFT_POSITION;
-        } else if (currentGamepad2.b && !previousGamepad2.b) {
-            liftMoveToPosition = true;
-            liftTargetPosition = 1000;
-        } else if (currentGamepad2.a && !previousGamepad1.a) {
-            liftMoveToPosition = true;
-            liftTargetPosition = 0;
+        if (!currentGamepad2.start) {
+            if (currentGamepad2.y && !previousGamepad1.y) {
+                liftMoveToPosition = true;
+                liftTargetPosition = MAX_LIFT_POSITION;
+            } else if (currentGamepad2.b && !previousGamepad2.b) {
+                liftMoveToPosition = true;
+                liftTargetPosition = 1000;
+            } else if (currentGamepad2.a && !previousGamepad1.a) {
+                liftMoveToPosition = true;
+                liftTargetPosition = 0;
+            }
         }
 
         double armAngleRadians = (robot.armMotor.getCurrentPosition() / ARM_TICKS_PER_REV * 2 * Math.PI) + ARM_ANGLE_OFFSET;  // TODO: angle estimation
@@ -137,7 +139,7 @@ public class TeleOpMode extends GamepadOpMode {
         }
 
         // TODO: implement slow down
-
+        // TODO: add lift current limit
         if (robot.liftMotor.getCurrentPosition() > maxLiftLength && liftCommand >= 0) {
             liftMoveToPosition = false;
             robot.liftMotor.setPower(liftPositionPID.update(maxLiftLength, robot.liftMotor.getCurrentPosition()));
