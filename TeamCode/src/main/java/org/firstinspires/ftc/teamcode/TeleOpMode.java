@@ -30,7 +30,7 @@ public class TeleOpMode extends GamepadOpMode {
 
     private final Robot robot = new Robot(this);
     private final PID armSlowdownPID = new PID(0, 0.002, 0.00001);
-    private final PID liftPositionPID = new PIDAW(0.01, 0.1, 0);
+    private final PID liftPositionPID = new PIDAW(0.1, 0.001, 0);
 
     private boolean precisionDriving = false;
     private boolean fieldCentric = true;
@@ -190,7 +190,7 @@ public class TeleOpMode extends GamepadOpMode {
                 }
                 robot.liftMotor.setPower(liftPositionPID.update(limitedLiftTargetPosition, robot.liftMotor.getCurrentPosition()));
                 int error = Math.abs(limitedLiftTargetPosition - robot.liftMotor.getCurrentPosition());
-                if (error < 20) {
+                if (error < 30) {
                     liftMoveToPosition = false;
                 }
             } else {
