@@ -15,11 +15,13 @@ public class TeleOpMode extends GamepadOpMode {
     public static double ARM_MAX_POWER = 0.6;
     public static double MAX_DRIVE_SPEED = 0.5;
     public static double MAX_TURN_SPEED = 0.4;
-    public static double CROUCH_SPEED = 0.2;
+    public static double PRECISION_SPEED = 0.2;
     public static int MAX_LIFT_POSITION = 1900;
     public static int MAX_LIFT_POSITION_HORIZONTAL = 1600;
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
+    public static double ARM_PRECISION_SPEED = 0.3;
+    public static double ARM_DOWN_SPEED = 0.2;
 
     final double ARM_TICKS_PER_REV =
             ((20.0) // HD Hex Motor 20:1 Planetary Gearbox
@@ -32,7 +34,8 @@ public class TeleOpMode extends GamepadOpMode {
     private final PID armSlowdownPID = new PID(0, 0.002, 0.00001);
     private final PID liftPositionPID = new PIDAW(0.1, 0.001, 0);
 
-    private boolean precisionDriving = false;
+    private boolean drivingPrecisionMode = false;
+    private boolean armPrecisionMode = false;
     private boolean fieldCentric = true;
     private boolean secondDriverLimitsDisabled = false;
 
@@ -68,7 +71,7 @@ public class TeleOpMode extends GamepadOpMode {
 
         // Toggle precision driving
         if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
-            precisionDriving = !precisionDriving;
+            drivingPrecisionMode = !drivingPrecisionMode;
         }
 
         double driveFactor = MAX_DRIVE_SPEED;
@@ -76,8 +79,8 @@ public class TeleOpMode extends GamepadOpMode {
         if (currentGamepad1.right_bumper) {
             driveFactor = 1;
             turnFactor = 1;
-        } else if (precisionDriving) {
-            driveFactor = CROUCH_SPEED;
+        } else if (drivingPrecisionMode) {
+            driveFactor = PRECISION_SPEED;
             turnFactor = turnFactor * 0.5;
         }
         if (currentGamepad1.share && !previousGamepad1.share) {
@@ -110,10 +113,16 @@ public class TeleOpMode extends GamepadOpMode {
             robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
+        if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
+            armPrecisionMode = !armPrecisionMode;
+        }
 
         double armCommand = -gamepad2.left_stick_y * ARM_MAX_POWER;
         if (armCommand < 0) {
-            armCommand = armCommand * 0.3;
+            armCommand = armCommand * ARM_DOWN_SPEED;
+        }
+        if (armPrecisionMode) {
+            armCommand = armCommand * ARM_PRECISION_SPEED;
         }
         telemetry.addData("Arm Command", armCommand);
 
@@ -164,6 +173,7 @@ public class TeleOpMode extends GamepadOpMode {
         }
 
         double liftCommand = -gamepad2.right_stick_y;
+
         if (!secondDriverLimitsDisabled) {
             // Slow down the lift when it is near the top or bottom
             if (liftCommand > 0 && robot.liftMotor.getCurrentPosition() >= MAX_LIFT_POSITION - LIFT_SLOWDOWN_DISTANCE) {
