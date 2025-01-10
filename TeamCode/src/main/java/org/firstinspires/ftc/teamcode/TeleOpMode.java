@@ -147,6 +147,7 @@ public class TeleOpMode extends GamepadOpMode {
 
         double armAngleRadians = (robot.armMotor.getCurrentPosition() / ARM_TICKS_PER_REV * 2 * Math.PI) + ARM_ANGLE_OFFSET;  // TODO: angle estimation
         double cosine = Math.cos(armAngleRadians);
+        cosine = Math.max(Math.abs(cosine), 0.1) * Math.signum(cosine); // Prevent division by zero
         double maxLiftLength = Math.max(MAX_LIFT_POSITION_HORIZONTAL / cosine, 0);
 
         if (!currentGamepad2.start) {
