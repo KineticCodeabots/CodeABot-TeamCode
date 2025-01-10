@@ -31,7 +31,7 @@ public class TeleOpMode extends GamepadOpMode {
             ) * 28;
 
     private final Robot robot = new Robot(this);
-    private final PID armSlowdownPID = new PID(0, 0.002, 0.00001);
+    private final PID armAntiGravityPID = new PID(0, 0.002, 0.00001);
     private final PID liftPositionPID = new PIDAW(0.1, 0.001, 0);
 
     private boolean drivingPrecisionMode = false;
@@ -129,18 +129,19 @@ public class TeleOpMode extends GamepadOpMode {
         // TODO: should be replaced with anti gravity compensation
         if (armCommand == 0) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
-            double armSlowdown;
+            double armAntiGravityCommand;
             if (Math.abs(robot.armMotor.getVelocity()) > 500) {
-                armSlowdown = 0;
+                armAntiGravityCommand = 0;
             } else {
-                armSlowdown = armSlowdownPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 50));
+                armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 50));
             }
-            telemetry.addData("Arm Slowdown", armSlowdown);
+            telemetry.addData("Arm Anti Gravity", armAntiGravityCommand);
 
-            robot.armMotor.setPower(armSlowdown);
+            robot.armMotor.setPower(armAntiGravityCommand);
         } else {
-            telemetry.addData("Arm Slowdown", 0);
-            armSlowdownPID.reset();
+            telemetry.addData("Arm Anti Gravity", 0);
+            double armAntiGravityCommand = armAntiGravityPID.update(0, 0);
+            armCommand += armAntiGravityCommand; // alternative use Math.max
             robot.armMotor.setPower(armCommand);
         }
         if (robot.armMotor.isOverCurrent()) {
