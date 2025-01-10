@@ -154,12 +154,15 @@ public class TeleOpMode extends GamepadOpMode {
             if (currentGamepad2.y && !previousGamepad1.y) {
                 liftMoveToPosition = true;
                 liftTargetPosition = 1500;
+                liftPositionPID.reset();
             } else if (currentGamepad2.b && !previousGamepad2.b) {
                 liftMoveToPosition = true;
                 liftTargetPosition = 1000;
+                liftPositionPID.reset();
             } else if (currentGamepad2.a && !previousGamepad1.a) {
                 liftMoveToPosition = true;
                 liftTargetPosition = 0;
+                liftPositionPID.reset();
             }
         }
 
