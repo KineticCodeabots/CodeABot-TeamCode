@@ -16,8 +16,8 @@ public class TeleOpMode extends GamepadOpMode {
     public static double MAX_DRIVE_SPEED = 0.5;
     public static double MAX_TURN_SPEED = 0.4;
     public static double PRECISION_SPEED = 0.2;
-    public static int MAX_LIFT_POSITION = 1900;
-    public static int MAX_LIFT_POSITION_HORIZONTAL = 1600;
+    public static int MAX_LIFT_POSITION = 1500;
+    public static int MAX_LIFT_POSITION_HORIZONTAL = 1000;
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
     public static double ARM_PRECISION_SPEED = 0.3;
@@ -103,6 +103,7 @@ public class TeleOpMode extends GamepadOpMode {
         if (currentGamepad2.back && !previousGamepad2.back) {
             secondDriverLimitsDisabled = !secondDriverLimitsDisabled;
         }
+        telemetry.addData("Second Driver Limits Disabled", secondDriverLimitsDisabled);
 
         armLoop();
         liftLoop();
@@ -163,13 +164,16 @@ public class TeleOpMode extends GamepadOpMode {
         if (!currentGamepad2.start) {
             if (currentGamepad2.y && !previousGamepad1.y) {
                 liftMoveToPosition = true;
-                liftTargetPosition = MAX_LIFT_POSITION;
+                liftTargetPosition = 1500;
+                liftPositionPID.reset();
             } else if (currentGamepad2.b && !previousGamepad2.b) {
                 liftMoveToPosition = true;
                 liftTargetPosition = 1000;
+                liftPositionPID.reset();
             } else if (currentGamepad2.a && !previousGamepad1.a) {
                 liftMoveToPosition = true;
                 liftTargetPosition = 0;
+                liftPositionPID.reset();
             }
         }
 
