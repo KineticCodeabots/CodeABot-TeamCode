@@ -28,7 +28,7 @@ public class TeleOpMode extends GamepadOpMode {
                     * (90.0 / 45.0) // Gear chain
                     * (125.0 / 60.0)
                     * (125.0 / 60.0)
-            ) * 28;
+            ) * 28; // HD Hex Motor 28 Pulses per Revolution
 
     private final Robot robot = new Robot(this);
     private final PID armAntiGravityPID = new PID(0, 0.002, 0.00001);
