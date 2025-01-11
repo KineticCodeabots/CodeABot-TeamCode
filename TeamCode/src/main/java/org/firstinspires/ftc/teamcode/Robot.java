@@ -86,8 +86,8 @@ public class Robot {
     }
 
     void updateMecanumRobotDrive(double drive, double strafe, double turn) {
-        double y = drive; // Remember, Y stick value is reversed
-        double x = strafe * 1.1; // Counteract imperfect strafing
+        double y = -drive; // Remember, Y stick value is reversed
+        double x = -strafe * 1.1; // Counteract imperfect strafing
         double rx = turn;
 
         // Denominator is the largest motor power (absolute value) or 1
@@ -106,8 +106,8 @@ public class Robot {
     }
 
     void updateMecanumFieldDrive(double drive, double strafe, double turn) {
-        double y = drive;
-        double x = strafe;
+        double y = -drive;
+        double x = -strafe;
         double rx = turn;
 
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
