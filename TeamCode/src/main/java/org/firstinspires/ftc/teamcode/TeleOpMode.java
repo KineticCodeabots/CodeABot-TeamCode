@@ -140,8 +140,8 @@ public class TeleOpMode extends GamepadOpMode {
 
             robot.armMotor.setPower(armAntiGravityCommand);
         } else {
-            telemetry.addData("Arm Anti Gravity", 0);
             double armAntiGravityCommand = armAntiGravityPID.update(0, 0);
+            telemetry.addData("Arm Anti Gravity", armAntiGravityCommand);
             armCommand += armAntiGravityCommand; // alternative use Math.max
             robot.armMotor.setPower(armCommand);
         }
