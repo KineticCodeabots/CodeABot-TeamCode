@@ -31,7 +31,7 @@ public class TeleOpMode extends GamepadOpMode {
             ) * 28; // HD Hex Motor 28 Pulses per Revolution
 
     private final Robot robot = new Robot(this);
-    private final PID armAntiGravityPID = new PID(0, 0.002, 0.00001);
+    private final PID armAntiGravityPID = new ArmAGPID(0, 0.002, 0.00001);
     private final PID liftPositionPID = new PIDAW(0.1, 0.001, 0);
 
     private boolean drivingPrecisionMode = false;
