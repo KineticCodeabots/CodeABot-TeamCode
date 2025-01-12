@@ -48,6 +48,9 @@ public class Auto extends LinearOpMode {
     public Alliance alliance;
     public StartingLocation startingLocation;
 
+    private final Robot robot = new Robot(this);
+    private final AutoRobot autoRobot = new AutoRobot(this, robot);
+
     public Auto(Alliance alliance, StartingLocation startingLocation) {
         this.alliance = alliance;
         this.startingLocation = startingLocation;
@@ -67,6 +70,8 @@ public class Auto extends LinearOpMode {
         } else {
             // right auto
         }
+
+        autoRobot.drive(1000, 0.1, 0.3);
     }
 
     @OpModeRegistrar
