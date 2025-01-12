@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 @TeleOp(name = "TeleOp")
 @Config
 public class TeleOpMode extends GamepadOpMode {
+    // Constants
     public static double ARM_MAX_POWER = 0.6;
     public static double MAX_DRIVE_SPEED = 0.5;
     public static double MAX_TURN_SPEED = 0.4;
@@ -29,15 +30,16 @@ public class TeleOpMode extends GamepadOpMode {
                     * (125.0 / 60.0)
             ) * 28; // HD Hex Motor 28 Pulses per Revolution
 
+    // Robot and PID controllers
     private final Robot robot = new Robot(this);
     private final PID armAntiGravityPID = new ArmAGPID(0, 0.002, 0.00001);
     private final PID liftPositionPID = new PIDAW(0.1, 0.001, 0);
 
+    // State variables
     private boolean drivingPrecisionMode = false;
     private boolean armPrecisionMode = false;
     private boolean fieldCentric = true;
     private boolean secondDriverLimitsDisabled = false;
-
     private boolean liftMoveToPosition = false;
     private int liftTargetPosition = 0;
     private boolean armAntiGravityDisabled = false;
