@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.testing;
 
 import android.annotation.SuppressLint;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -16,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @TeleOp(name = "Motor Multi Variability Tester", group = "Testing")
+@Disabled
 public class MotorMultiVariabilityTester extends MotorVariabilityTester {
     private final Map<Double, MotorPowerResults> motorPowerResults = new LinkedHashMap<>();
 
