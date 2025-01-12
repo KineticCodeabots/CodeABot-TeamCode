@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.testing;
 import android.annotation.SuppressLint;
 import android.os.Environment;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -24,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @TeleOp(name = "Motor Variability Tester", group = "Testing")
+@Disabled
 public class MotorVariabilityTester extends OpMode {
     private static final Comparator<Map.Entry<String, DcMotor>> motorComparator = Comparator.comparing(
             entry -> entry.getValue().getPortNumber()
