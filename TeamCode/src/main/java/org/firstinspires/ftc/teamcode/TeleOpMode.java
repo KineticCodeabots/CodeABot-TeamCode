@@ -21,7 +21,6 @@ public class TeleOpMode extends GamepadOpMode {
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
     public static double ARM_PRECISION_SPEED = 0.3;
-    public static double ARM_DOWN_SPEED = 0.5;
 
     final double ARM_TICKS_PER_REV =
             ((20.0) // HD Hex Motor 20:1 Planetary Gearbox
@@ -123,22 +122,17 @@ public class TeleOpMode extends GamepadOpMode {
         }
 
         double armCommand = -gamepad2.left_stick_y * ARM_MAX_POWER;
-        if (armCommand < 0) {
-            armCommand = armCommand * ARM_DOWN_SPEED;
-        }
         if (armPrecisionMode) {
             armCommand = armCommand * ARM_PRECISION_SPEED;
         }
         telemetry.addData("Arm Command", armCommand);
 
-        // TODO: should be replaced with anti gravity compensation
         if (armCommand == 0) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
             double armAntiGravityCommand;
             if (Math.abs(robot.armMotor.getVelocity()) > 500) {
                 armAntiGravityCommand = 0;
             } else {
-                // TODO: limit integeral wind up
                 armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 50));
             }
 
