@@ -132,7 +132,7 @@ public class TeleOpMode extends GamepadOpMode {
         if (armCommand == 0) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
             double armAntiGravityCommand;
-            if (Math.abs(robot.armMotor.getVelocity()) > 500) {
+            if (Math.abs(robot.armMotor.getVelocity()) > 200) {
                 armAntiGravityCommand = 0;
             } else {
                 armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 50));
