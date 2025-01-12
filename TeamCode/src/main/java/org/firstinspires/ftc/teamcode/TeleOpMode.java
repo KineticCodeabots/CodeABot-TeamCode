@@ -81,7 +81,7 @@ public class TeleOpMode extends GamepadOpMode {
         if (currentGamepad1.right_bumper) {
             driveFactor = 1;
             turnFactor = 1;
-        } else if (drivingPrecisionMode) {
+        } else if (currentGamepad1.left_bumper) {
             driveFactor = PRECISION_SPEED;
             turnFactor = turnFactor * 0.5;
         }
