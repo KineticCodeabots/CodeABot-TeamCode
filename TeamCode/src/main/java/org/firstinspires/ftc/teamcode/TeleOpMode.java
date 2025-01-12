@@ -159,8 +159,8 @@ public class TeleOpMode extends GamepadOpMode {
             robot.liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
-        double armAngleRadians = (robot.armMotor.getCurrentPosition() / ARM_TICKS_PER_REV * 2 * Math.PI) + ARM_ANGLE_OFFSET;  // TODO: angle estimation
-        double cosine = Math.cos(Range.clip(armAngleRadians, -Math.PI / 2, Math.PI / 2));
+        double armAngleRads = (robot.armMotor.getCurrentPosition() / ARM_TICKS_PER_REV * 2 * Math.PI) + ARM_ANGLE_OFFSET;
+        double cosine = Math.cos(Range.clip(armAngleRads, -Math.PI / 2, Math.PI / 2));
         double maxLiftLength = Math.max(MAX_LIFT_POSITION_HORIZONTAL / cosine, 0);
 
         if (!currentGamepad2.start) {
@@ -192,8 +192,6 @@ public class TeleOpMode extends GamepadOpMode {
             }
         }
 
-        // TODO: add lift current limit
-
         if (!secondDriverLimitsDisabled && robot.liftMotor.getCurrentPosition() > maxLiftLength && liftCommand >= 0) {
             liftMoveToPosition = false;
             robot.liftMotor.setPower(liftPositionPID.update(maxLiftLength, robot.liftMotor.getCurrentPosition()));
@@ -212,6 +210,10 @@ public class TeleOpMode extends GamepadOpMode {
                 }
             } else {
                 liftMoveToPosition = false;
+                // slow down the lift when getting close to maxLiftLength
+                if (!secondDriverLimitsDisabled && robot.liftMotor.getCurrentPosition() > maxLiftLength - LIFT_SLOWDOWN_DISTANCE) {
+                    liftCommand *= (maxLiftLength - robot.liftMotor.getCurrentPosition()) / LIFT_SLOWDOWN_DISTANCE;
+                }
                 robot.liftMotor.setPower(liftCommand);
             }
         }
