@@ -15,7 +15,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
 public class Robot {
-    // TODO: better config system
     public static double CLAW_OPEN_POSITION = 0.1;
     public static double CLAW_CLOSED_POSITION = 0.4;
     public static DcMotor.ZeroPowerBehavior DRIVE_MOTOR_ZERO_POWER = DcMotor.ZeroPowerBehavior.BRAKE;
