@@ -21,7 +21,7 @@ public class TeleOpMode extends GamepadOpMode {
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
     public static double ARM_PRECISION_SPEED = 0.3;
-    public static double ARM_DOWN_SPEED = 0.2;
+    public static double ARM_DOWN_SPEED = 0.5;
 
     final double ARM_TICKS_PER_REV =
             ((20.0) // HD Hex Motor 20:1 Planetary Gearbox
@@ -41,6 +41,7 @@ public class TeleOpMode extends GamepadOpMode {
 
     private boolean liftMoveToPosition = false;
     private int liftTargetPosition = 0;
+    private boolean armAntiGravityDisabled = false;
 
     @Override
     public void init() {
@@ -117,6 +118,9 @@ public class TeleOpMode extends GamepadOpMode {
         if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
             armPrecisionMode = !armPrecisionMode;
         }
+        if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
+            armAntiGravityDisabled = !armAntiGravityDisabled;
+        }
 
         double armCommand = -gamepad2.left_stick_y * ARM_MAX_POWER;
         if (armCommand < 0) {
@@ -134,20 +138,25 @@ public class TeleOpMode extends GamepadOpMode {
             if (Math.abs(robot.armMotor.getVelocity()) > 500) {
                 armAntiGravityCommand = 0;
             } else {
+                // TODO: limit integeral wind up
                 armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 50));
             }
-            telemetry.addData("Arm Anti Gravity", armAntiGravityCommand);
 
             robot.armMotor.setPower(armAntiGravityCommand);
         } else {
             double armAntiGravityCommand = armAntiGravityPID.update(0, 0);
             telemetry.addData("Arm Anti Gravity", armAntiGravityCommand);
             armCommand += armAntiGravityCommand; // alternative use Math.max
+            if (!currentGamepad2.right_bumper) {
+                armCommand += armAntiGravityCommand; // alternative use Math.max
+            }
             robot.armMotor.setPower(armCommand);
         }
+
         if (robot.armMotor.isOverCurrent()) {
             telemetry.addLine("ARM MOTOR EXCEEDED CURRENT LIMIT!");
         }
+        telemetry.addData("Arm Anti Gravity Disabled", armAntiGravityDisabled);
     }
 
     private void liftLoop() {
@@ -167,7 +176,7 @@ public class TeleOpMode extends GamepadOpMode {
                 liftPositionPID.reset();
             } else if (currentGamepad2.b && !previousGamepad2.b) {
                 liftMoveToPosition = true;
-                liftTargetPosition = 1000;
+                liftTargetPosition = 600;
                 liftPositionPID.reset();
             } else if (currentGamepad2.a && !previousGamepad1.a) {
                 liftMoveToPosition = true;
