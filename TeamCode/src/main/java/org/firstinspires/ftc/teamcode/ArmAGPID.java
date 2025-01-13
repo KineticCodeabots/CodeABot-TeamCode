@@ -11,8 +11,8 @@ public class ArmAGPID extends PID {
     public double update(double reference, double state) {
         double error = reference - state;
         double derivative = (error - lastError) / timer.seconds();
-        integralSum = Range.clip(integralSum + (error * timer.seconds()), -1, 1); // anti-windup
-        // TODO: fix clip bug
+        double integralLimit = 1 / Ki;
+        integralSum = Range.clip(integralSum + (error * timer.seconds()), -integralLimit, integralLimit); // anti-windup
         lastReference = reference;
         timer.reset();
         return (Kp * error) + (Ki * integralSum) + (Kd * derivative);
