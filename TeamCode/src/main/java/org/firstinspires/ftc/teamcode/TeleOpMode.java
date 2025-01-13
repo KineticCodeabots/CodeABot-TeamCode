@@ -36,7 +36,6 @@ public class TeleOpMode extends GamepadOpMode {
     private final PID liftPositionPID = new PIDAW(0.1, 0.001, 0);
 
     // State variables
-    private boolean drivingPrecisionMode = false;
     private boolean armPrecisionMode = false;
     private boolean fieldCentric = true;
     private boolean secondDriverLimitsDisabled = false;
@@ -69,11 +68,6 @@ public class TeleOpMode extends GamepadOpMode {
     private void firstDriverLoop() {
         if (gamepad1.right_stick_button) {
             robot.imu.resetYaw();
-        }
-
-        // Toggle precision driving
-        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
-            drivingPrecisionMode = !drivingPrecisionMode;
         }
 
         double driveFactor = MAX_DRIVE_SPEED;
@@ -132,12 +126,12 @@ public class TeleOpMode extends GamepadOpMode {
         if (armCommand == 0) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
             double armAntiGravityCommand;
-            if (Math.abs(robot.armMotor.getVelocity()) > 200) {
+            if (Math.abs(robot.armMotor.getVelocity()) > 300) {
                 armAntiGravityCommand = 0;
             } else {
                 armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 50));
             }
-
+            telemetry.addData("Arm Anti Gravity", armAntiGravityCommand);
             robot.armMotor.setPower(armAntiGravityCommand);
         } else {
             double armAntiGravityCommand = armAntiGravityPID.update(0, 0);

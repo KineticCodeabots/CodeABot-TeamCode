@@ -12,6 +12,7 @@ public class ArmAGPID extends PID {
         double error = reference - state;
         double derivative = (error - lastError) / timer.seconds();
         integralSum = Range.clip(integralSum + (error * timer.seconds()), -1, 1); // anti-windup
+        // TODO: fix clip bug
         lastReference = reference;
         timer.reset();
         return (Kp * error) + (Ki * integralSum) + (Kd * derivative);
