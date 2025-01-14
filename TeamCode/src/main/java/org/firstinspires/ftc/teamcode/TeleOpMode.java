@@ -97,7 +97,11 @@ public class TeleOpMode extends GamepadOpMode {
             robot.updateMecanumRobotDrive(-gamepad1.left_stick_y * driveFactor, gamepad1.left_stick_x * driveFactor, gamepad1.right_stick_x * turnFactor);
         }
 
-        telemetry.addData("Field Centric Mode", fieldCentric);
+        if (fieldCentric) {
+            telemetry.addLine("<font color='orange'>Field Centric Mode</font>");
+        } else {
+            telemetry.addLine("<font color='red'>Robot Centric Mode</font>");
+        }
     }
 
     private void operatorLoop() {
@@ -108,7 +112,9 @@ public class TeleOpMode extends GamepadOpMode {
         if (currentGamepad2.back && !previousGamepad2.back) {
             operatorLimitsDisabled = !operatorLimitsDisabled;
         }
-        telemetry.addData("Operator Limits Disabled", operatorLimitsDisabled);
+        if (operatorLimitsDisabled) {
+            telemetry.addLine("<font color='red'>Operator Limits Disabled</font>");
+        }
 
         double armAngleRads = (robot.armMotor.getCurrentPosition() / ARM_TICKS_PER_REV * 2 * Math.PI) + ARM_ANGLE_OFFSET;
         double cosine = Math.cos(Range.clip(armAngleRads, -Math.PI / 2, Math.PI / 2));
