@@ -34,7 +34,7 @@ public class TeleOpMode extends GamepadOpMode {
 
     // Robot and PID controllers
     private final Robot robot = new Robot(this);
-    private final PID armAntiGravityPID = new ArmAGPID(0, 0.0002, 0);
+    private final PID armAntiGravityPID = new ArmAGPID(0, 0.0003, 0);
     private final PID liftPositionPID = new PIDAW(0.1, 0.001, 0);
 
     // State variables
@@ -101,7 +101,7 @@ public class TeleOpMode extends GamepadOpMode {
     }
 
     private void operatorLoop() {
-        if (currentGamepad2.x && !previousGamepad2.x) {
+        if ((currentGamepad2.x && !previousGamepad2.x) || (currentGamepad1.x && !previousGamepad1.x)) {
             robot.toggleClaw();
         }
 
@@ -139,7 +139,7 @@ public class TeleOpMode extends GamepadOpMode {
                 if (Math.abs(robot.armMotor.getVelocity()) > 200) {
                     armAntiGravityCommand = 0;
                 } else {
-                    armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -100, 50));
+                    armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -100, 100));
                 }
 
             } else {
@@ -151,13 +151,13 @@ public class TeleOpMode extends GamepadOpMode {
         armCommand = armOperatorInput;
         if (armCommand < 0) {
             if (armPrecisionMode) {
-                armCommand *= Math.max(armAntiGravityCommand, 0.01);
+                armCommand *= Math.max(armAntiGravityCommand * 1.5, 0.01);
             } else {
                 armCommand *= ARM_DOWN_POWER;
             }
         } else {
             if (armPrecisionMode) {
-                armCommand *= ARM_PRECISION_SPEED;
+                armCommand *= Math.max(armAntiGravityCommand * 1.5, ARM_PRECISION_SPEED);
             } else {
                 armCommand *= ARM_MAX_POWER;
             }
