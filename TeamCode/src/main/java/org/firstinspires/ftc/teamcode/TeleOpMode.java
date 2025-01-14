@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @TeleOp(name = "TeleOp")
@@ -14,6 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 public class TeleOpMode extends GamepadOpMode {
     // Constants
     public static double ARM_MAX_POWER = 0.6;
+    public static double ARM_DOWN_POWER = 0.2;
+    public static double ARM_PRECISION_SPEED = 0.2;
     public static double MAX_DRIVE_SPEED = 0.5;
     public static double MAX_TURN_SPEED = 0.4;
     public static double PRECISION_SPEED = 0.2;
@@ -21,7 +24,6 @@ public class TeleOpMode extends GamepadOpMode {
     public static int MAX_LIFT_POSITION_HORIZONTAL = 1000;
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
-    public static double ARM_PRECISION_SPEED = 0.3;
 
     final double ARM_TICKS_PER_REV =
             ((20.0) // HD Hex Motor 20:1 Planetary Gearbox
@@ -32,40 +34,47 @@ public class TeleOpMode extends GamepadOpMode {
 
     // Robot and PID controllers
     private final Robot robot = new Robot(this);
-    private final PID armAntiGravityPID = new ArmAGPID(0, 0.002, 0.00001);
+    private final PID armAntiGravityPID = new ArmAGPID(0, 0.0002, 0);
     private final PID liftPositionPID = new PIDAW(0.1, 0.001, 0);
 
     // State variables
+    private static boolean debugMode = false;
+
     private boolean armPrecisionMode = false;
     private boolean fieldCentric = true;
-    private boolean secondDriverLimitsDisabled = false;
+    private boolean operatorLimitsDisabled = false;
     private boolean liftMoveToPosition = false;
     private int liftTargetPosition = 0;
-    private boolean armAntiGravityDisabled = false;
 
     @Override
     public void init() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
-        telemetry.addData("Status", "Initializing");
+        telemetry.addData("<b>Status</b>", "<font color='orange'>Initializing</font>");
         telemetry.update();
         robot.init();
         robot.armMotor.setCurrentAlert(5, CurrentUnit.AMPS);
         robot.liftMotor.setCurrentAlert(5, CurrentUnit.AMPS);
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("<b>Status</b>", "<font color='green'>Initialized</font>");
         telemetry.update();
     }
 
     @Override
     public void loop() {
-        telemetry.addData("Status", "Running");
+        telemetry.addData("<b>Status</b>", "<font color='blue'>Running</font>");
         updateGamepads();
 
-        firstDriverLoop();
-        secondDriverLoop();
+        if ((currentGamepad1.start && currentGamepad1.y && !previousGamepad1.y) || (currentGamepad2.start && currentGamepad2.y && !previousGamepad2.y)) {
+            debugMode = !debugMode;
+        }
+        if (debugMode) telemetry.addLine("<font color='red'>DEBUG MODE</font>");
+
+        driverLoop();
+        operatorLoop();
     }
 
-    private void firstDriverLoop() {
+    private void driverLoop() {
         if (gamepad1.right_stick_button) {
             robot.imu.resetYaw();
         }
@@ -91,72 +100,89 @@ public class TeleOpMode extends GamepadOpMode {
         telemetry.addData("Field Centric Mode", fieldCentric);
     }
 
-    private void secondDriverLoop() {
+    private void operatorLoop() {
         if (currentGamepad2.x && !previousGamepad2.x) {
             robot.toggleClaw();
         }
 
         if (currentGamepad2.back && !previousGamepad2.back) {
-            secondDriverLimitsDisabled = !secondDriverLimitsDisabled;
+            operatorLimitsDisabled = !operatorLimitsDisabled;
         }
-        telemetry.addData("Second Driver Limits Disabled", secondDriverLimitsDisabled);
+        telemetry.addData("Operator Limits Disabled", operatorLimitsDisabled);
 
-        armLoop();
-        liftLoop();
+        double armAngleRads = (robot.armMotor.getCurrentPosition() / ARM_TICKS_PER_REV * 2 * Math.PI) + ARM_ANGLE_OFFSET;
+        double cosine = Math.cos(Range.clip(armAngleRads, -Math.PI / 2, Math.PI / 2));
+        if (debugMode) telemetry.addData("Arm Angle", armAngleRads);
+        if (debugMode) telemetry.addData("Cosine", cosine);
+
+        armLoop(armAngleRads);
+        liftLoop(cosine);
     }
 
-    private void armLoop() {
+    private void armLoop(double armAngleRads) {
         if (currentGamepad2.left_stick_button && !previousGamepad2.left_stick_button) {
             robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-        if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
-            armPrecisionMode = !armPrecisionMode;
-        }
-        if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
-            armAntiGravityDisabled = !armAntiGravityDisabled;
-        }
-
-        double armCommand = -gamepad2.left_stick_y * ARM_MAX_POWER;
+        armPrecisionMode = currentGamepad2.left_bumper;
         if (armPrecisionMode) {
-            armCommand = armCommand * ARM_PRECISION_SPEED;
+            telemetry.addLine("<font color='orange'>Arm Precision Mode</font>");
         }
-        telemetry.addData("Arm Command", armCommand);
 
-        if (armCommand == 0) {
+        double armOperatorInput = -stickDeadZoneComp(gamepad2.left_stick_y, 0.1);
+        if (debugMode) telemetry.addData("Arm Operator Input", armOperatorInput);
+
+        double armAntiGravityCommand = 0;
+        if (!currentGamepad2.right_bumper) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
-            double armAntiGravityCommand;
-            if (Math.abs(robot.armMotor.getVelocity()) > 300) {
-                armAntiGravityCommand = 0;
+            if (armOperatorInput == 0) {
+                if (Math.abs(robot.armMotor.getVelocity()) > 200) {
+                    armAntiGravityCommand = 0;
+                } else {
+                    armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -100, 50));
+                }
+
             } else {
-                armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -200, 50));
+                armAntiGravityCommand = armAntiGravityPID.update(0, 0);
             }
-            telemetry.addData("Arm Anti Gravity", armAntiGravityCommand);
-            robot.armMotor.setPower(armAntiGravityCommand);
-        } else {
-            double armAntiGravityCommand = armAntiGravityPID.update(0, 0);
-            telemetry.addData("Arm Anti Gravity", armAntiGravityCommand);
-            armCommand += armAntiGravityCommand; // alternative use Math.max
-            if (!currentGamepad2.right_bumper) {
-                armCommand += armAntiGravityCommand; // alternative use Math.max
-            }
-            robot.armMotor.setPower(armCommand);
         }
 
-        if (robot.armMotor.isOverCurrent()) {
-            telemetry.addLine("ARM MOTOR EXCEEDED CURRENT LIMIT!");
+        double armCommand;
+        armCommand = armOperatorInput;
+        if (armCommand < 0) {
+            if (armPrecisionMode) {
+                armCommand *= Math.max(armAntiGravityCommand, 0.01);
+            } else {
+                armCommand *= ARM_DOWN_POWER;
+            }
+        } else {
+            if (armPrecisionMode) {
+                armCommand *= ARM_PRECISION_SPEED;
+            } else {
+                armCommand *= ARM_MAX_POWER;
+            }
         }
-        telemetry.addData("Arm Anti Gravity Disabled", armAntiGravityDisabled);
+
+        armCommand += armAntiGravityCommand;
+
+        if (debugMode) telemetry.addData("Arm Anti Gravity", armAntiGravityCommand);
+
+        robot.armMotor.setPower(armCommand);
+
+        if (debugMode) telemetry.addData("Arm Power", robot.armMotor.getPower());
+//        telemetry.addData("")
+        if (robot.armMotor.isOverCurrent()) {
+            telemetry.addLine("<font color='red'>ARM MOTOR EXCEEDED CURRENT LIMIT!</font>");
+        }
     }
 
-    private void liftLoop() {
+    private void liftLoop(double cosine) {
         if (currentGamepad2.right_stick_button && !previousGamepad2.right_stick_button) {
             robot.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
-        double armAngleRads = (robot.armMotor.getCurrentPosition() / ARM_TICKS_PER_REV * 2 * Math.PI) + ARM_ANGLE_OFFSET;
-        double cosine = Math.cos(Range.clip(armAngleRads, -Math.PI / 2, Math.PI / 2));
+
         double maxLiftLength = Math.max(MAX_LIFT_POSITION_HORIZONTAL / cosine, 0);
 
         if (!currentGamepad2.start) {
@@ -177,7 +203,7 @@ public class TeleOpMode extends GamepadOpMode {
 
         double liftCommand = -gamepad2.right_stick_y;
 
-        if (!secondDriverLimitsDisabled) {
+        if (!operatorLimitsDisabled) {
             // Slow down the lift when it is near the top or bottom
             if (liftCommand > 0 && robot.liftMotor.getCurrentPosition() >= MAX_LIFT_POSITION - LIFT_SLOWDOWN_DISTANCE) {
                 double slowDownFactor = Math.max((double) (MAX_LIFT_POSITION - robot.liftMotor.getCurrentPosition()) / LIFT_SLOWDOWN_DISTANCE, 0);
@@ -188,13 +214,13 @@ public class TeleOpMode extends GamepadOpMode {
             }
         }
 
-        if (!secondDriverLimitsDisabled && robot.liftMotor.getCurrentPosition() > maxLiftLength && liftCommand >= 0) {
+        if (!operatorLimitsDisabled && robot.liftMotor.getCurrentPosition() > maxLiftLength && liftCommand >= 0) {
             liftMoveToPosition = false;
             robot.liftMotor.setPower(liftPositionPID.update(maxLiftLength, robot.liftMotor.getCurrentPosition()));
         } else {
             if (liftMoveToPosition && liftCommand == 0) {
                 int limitedLiftTargetPosition;
-                if (!secondDriverLimitsDisabled) {
+                if (!operatorLimitsDisabled) {
                     limitedLiftTargetPosition = Math.min(liftTargetPosition, (int) maxLiftLength);
                 } else {
                     limitedLiftTargetPosition = liftTargetPosition;
@@ -207,7 +233,7 @@ public class TeleOpMode extends GamepadOpMode {
             } else {
                 liftMoveToPosition = false;
                 // slow down the lift when getting close to maxLiftLength
-                if (!secondDriverLimitsDisabled && robot.liftMotor.getCurrentPosition() > maxLiftLength - LIFT_SLOWDOWN_DISTANCE) {
+                if (!operatorLimitsDisabled && robot.liftMotor.getCurrentPosition() > maxLiftLength - LIFT_SLOWDOWN_DISTANCE) {
                     liftCommand *= (maxLiftLength - robot.liftMotor.getCurrentPosition()) / LIFT_SLOWDOWN_DISTANCE;
                 }
                 robot.liftMotor.setPower(liftCommand);
@@ -218,7 +244,26 @@ public class TeleOpMode extends GamepadOpMode {
         telemetry.addData("Lift Position", robot.liftMotor.getCurrentPosition());
 
         if (robot.liftMotor.isOverCurrent()) {
-            telemetry.addLine("LIFT MOTOR EXCEEDED CURRENT LIMIT!");
+            telemetry.addLine("<font color='red'>LIFT MOTOR EXCEEDED CURRENT LIMIT!</font>");
+        }
+    }
+
+    public static double stickDeadZoneComp(double number, double min) {
+        if (number <= -1) {
+            return -1.0;
+        }
+        if (number >= 1) {
+            return 1.0;
+        }
+        if (Math.abs(number) < min) {
+            return 0.0;
+        }
+        // Scale the number proportionally
+        double rangeMin = min - 1; // Effective lower bound
+        if (number > 0) {
+            return (number - min) / (1 - min);
+        } else {
+            return (number + min) / (1 - min);
         }
     }
 }
