@@ -61,6 +61,7 @@ public class Auto extends LinearOpMode {
         telemetry.addData("Alliance", alliance);
         telemetry.addData("Starting Location", startingLocation);
         telemetry.update();
+        robot.init();
         waitForStart();
         if (alliance == Alliance.RED) {
             // flip direction
@@ -71,7 +72,8 @@ public class Auto extends LinearOpMode {
             // right auto
         }
 
-        autoRobot.drive(1000, 0.1, 0.3);
+        autoRobot.drive(250, 0.1, 0.3);
+        autoRobot.strafe(1000);
     }
 
     @OpModeRegistrar

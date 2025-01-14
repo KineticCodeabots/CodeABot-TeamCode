@@ -28,20 +28,20 @@ public class AutoRobot {
             int backLeftStartPosition = robot.backLeftMotor.getCurrentPosition();
             int backRightStartPosition = robot.backRightMotor.getCurrentPosition();
 
-            int frontLeftTarget = frontLeftStartPosition + moveCounts;
-            int frontRightTarget = frontRightStartPosition + moveCounts;
-            int backLeftTarget = backLeftStartPosition + moveCounts;
-            int backRightTarget = backRightStartPosition + moveCounts;
+            int frontLeftTarget = frontLeftStartPosition - moveCounts;
+            int frontRightTarget = frontRightStartPosition - moveCounts;
+            int backLeftTarget = backLeftStartPosition - moveCounts;
+            int backRightTarget = backRightStartPosition - moveCounts;
 
             robot.frontLeftMotor.setTargetPosition(frontLeftTarget);
             robot.frontRightMotor.setTargetPosition(frontRightTarget);
             robot.backLeftMotor.setTargetPosition(backLeftTarget);
             robot.backRightMotor.setTargetPosition(backRightTarget);
 
-            robot.frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // Initialize motion profile parameters
             double elapsedTime = 0;
@@ -55,21 +55,73 @@ public class AutoRobot {
 
                 elapsedTime = runtime.seconds();
 
-                double targetPosition = motionProfile(maxAcceleration, maxVelocity, distance, elapsedTime);
+                robot.frontLeftMotor.setPower(0.2);
+                robot.frontRightMotor.setPower(0.2);
+                robot.backLeftMotor.setPower(0.2);
+                robot.backRightMotor.setPower(0.2);
 
-                // Use PID controller to calculate motor power
-                double currentPosition = robot.frontLeftMotor.getCurrentPosition();
-                double motorPower = drivePIDController.update(targetPosition, currentPosition);
+//                opMode.telemetry.addData("Target Position", targetPosition);
+//                opMode.telemetry.addData("Current Position", currentPosition);
+//                opMode.telemetry.addData("Motor Power", motorPower);
+                opMode.telemetry.update();
+            }
 
-                // Apply motor power
-                robot.frontLeftMotor.setPower(motorPower);
-                robot.frontRightMotor.setPower(motorPower);
-                robot.backLeftMotor.setPower(motorPower);
-                robot.backRightMotor.setPower(motorPower);
+            // Stop motors
+            robot.frontLeftMotor.setPower(0);
+            robot.frontRightMotor.setPower(0);
+            robot.backLeftMotor.setPower(0);
+            robot.backRightMotor.setPower(0);
 
-                opMode.telemetry.addData("Target Position", targetPosition);
-                opMode.telemetry.addData("Current Position", currentPosition);
-                opMode.telemetry.addData("Motor Power", motorPower);
+            robot.frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+    }
+
+    public void strafe(double distance) {
+        if (opMode.opModeIsActive()) {
+            int moveCounts = (int) (distance * COUNTS_PER_INCH);
+            int frontLeftStartPosition = robot.frontLeftMotor.getCurrentPosition();
+            int frontRightStartPosition = robot.frontRightMotor.getCurrentPosition();
+            int backLeftStartPosition = robot.backLeftMotor.getCurrentPosition();
+            int backRightStartPosition = robot.backRightMotor.getCurrentPosition();
+
+            int frontLeftTarget = frontLeftStartPosition - moveCounts;
+            int frontRightTarget = frontRightStartPosition + moveCounts;
+            int backLeftTarget = backLeftStartPosition + moveCounts;
+            int backRightTarget = backRightStartPosition - moveCounts;
+
+            robot.frontLeftMotor.setTargetPosition(frontLeftTarget);
+            robot.frontRightMotor.setTargetPosition(frontRightTarget);
+            robot.backLeftMotor.setTargetPosition(backLeftTarget);
+            robot.backRightMotor.setTargetPosition(backRightTarget);
+
+            robot.frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // Initialize motion profile parameters
+            double elapsedTime = 0;
+
+            ElapsedTime runtime = new ElapsedTime();
+
+            while (opMode.opModeIsActive() && robot.frontLeftMotor.isBusy() &&
+                    robot.frontRightMotor.isBusy() &&
+                    robot.backLeftMotor.isBusy() &&
+                    robot.backRightMotor.isBusy()) {
+
+                elapsedTime = runtime.seconds();
+
+                robot.frontLeftMotor.setPower(0.2);
+                robot.frontRightMotor.setPower(0.2);
+                robot.backLeftMotor.setPower(0.2);
+                robot.backRightMotor.setPower(0.2);
+
+//                opMode.telemetry.addData("Target Position", targetPosition);
+//                opMode.telemetry.addData("Current Position", currentPosition);
+//                opMode.telemetry.addData("Motor Power", motorPower);
                 opMode.telemetry.update();
             }
 
