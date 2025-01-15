@@ -157,13 +157,13 @@ public class TeleOpMode extends GamepadOpMode {
         armCommand = armOperatorInput;
         if (armCommand < 0) {
             if (armPrecisionMode) {
-                armCommand *= Math.max(armAntiGravityCommand * 1.5, 0.01);
+                armCommand *= Math.max(armAntiGravityCommand * 2, 0.01);
             } else {
                 armCommand *= ARM_DOWN_POWER;
             }
         } else {
             if (armPrecisionMode) {
-                armCommand *= Math.max(armAntiGravityCommand * 1.5, ARM_PRECISION_SPEED);
+                armCommand *= Math.max(armAntiGravityCommand * 2, ARM_PRECISION_SPEED);
             } else {
                 armCommand *= ARM_MAX_POWER;
             }
@@ -264,8 +264,6 @@ public class TeleOpMode extends GamepadOpMode {
         if (Math.abs(number) < min) {
             return 0.0;
         }
-        // Scale the number proportionally
-        double rangeMin = min - 1; // Effective lower bound
         if (number > 0) {
             return (number - min) / (1 - min);
         } else {
