@@ -34,7 +34,7 @@ public class TeleOpMode extends GamepadOpMode {
 
     // Robot and PID controllers
     private final Robot robot = new Robot(this);
-    private final PID armAntiGravityPID = new ArmAGPID(0, 0.0003, 0);
+    private final PID armAntiGravityPID = new ArmAGPID(0, 0.0004, 0);
     private final PID liftPositionPID = new PIDAW(0.1, 0.001, 0);
 
     // State variables
@@ -177,6 +177,7 @@ public class TeleOpMode extends GamepadOpMode {
 
         if (debugMode) telemetry.addData("Arm Power", robot.armMotor.getPower());
 //        telemetry.addData("")
+        if (debugMode) telemetry.addData("Arm Position", robot.armMotor.getCurrentPosition());
         if (robot.armMotor.isOverCurrent()) {
             telemetry.addLine("<font color='red'>ARM MOTOR EXCEEDED CURRENT LIMIT!</font>");
         }
@@ -194,11 +195,11 @@ public class TeleOpMode extends GamepadOpMode {
         if (!currentGamepad2.start) {
             if (currentGamepad2.y && !previousGamepad1.y) {
                 liftMoveToPosition = true;
-                liftTargetPosition = 1500;
+                liftTargetPosition = 1350;
                 liftPositionPID.reset();
             } else if (currentGamepad2.b && !previousGamepad2.b) {
                 liftMoveToPosition = true;
-                liftTargetPosition = 600;
+                liftTargetPosition = 350;
                 liftPositionPID.reset();
             } else if (currentGamepad2.a && !previousGamepad1.a) {
                 liftMoveToPosition = true;

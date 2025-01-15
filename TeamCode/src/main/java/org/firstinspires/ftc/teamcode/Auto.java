@@ -5,10 +5,14 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 
 public class Auto extends LinearOpMode {
+    public static int ARM_POSITION = 670;
+    public static int DRIVE_POSITION = 1600;
+
     public enum Alliance {
         BLUE,
         RED;
@@ -72,8 +76,31 @@ public class Auto extends LinearOpMode {
             // right auto
         }
 
-        autoRobot.drive(250, 0.1, 0.3);
-        autoRobot.strafe(1000);
+        robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
+        sleep(1000);
+
+        robot.armMotor.setTargetPosition(1070);
+        robot.armMotor.setPower(0.2);
+        robot.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        autoRobot.drive(1900, 0.1, 0.3);
+//        robot.liftMotor.setTargetPosition(800);
+//        robot.liftMotor.setPower(0.5);
+//        robot.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        while (robot.liftMotor.isBusy()) {
+//            telemetry.update();
+//        }
+//        robot.liftMotor.setTargetPosition(0);
+        robot.armMotor.setTargetPosition(700);
+        robot.armMotor.setPower(0.2);
+        autoRobot.drive(-900, 0, 0);
+
+        robot.claw.setPosition(Robot.CLAW_OPEN_POSITION);
+        autoRobot.drive(-700, 0, 0);
+        autoRobot.strafe(3000);
+        while (opModeIsActive()) {
+
+        }
+        //        autoRobot.strafe(1000);
     }
 
     @OpModeRegistrar
