@@ -10,112 +10,69 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 
 public class Auto extends LinearOpMode {
-    public static int ARM_POSITION = 670;
-    public static int DRIVE_POSITION = 1600;
+    public static int ARM_POSITION = 1070;
+    public static double DRiVE_SPEED = 0.3;
+    public static int PARK_STRAFE_DISTANCE = 2000;
+    public static int SPECIMEN_PARK_DISTANCE = 3000;
 
-    public enum Alliance {
-        BLUE,
-        RED;
-
-        @NonNull
-        @Override
-        public String toString() {
-            switch (this) {
-                case BLUE:
-                    return "Blue";
-                case RED:
-                    return "Red";
-                default:
-                    throw new IllegalArgumentException();
-            }
-        }
+    public enum AutoMode {
+        SPECIMEN,
+        PARK
     }
 
-    public enum StartingLocation {
-        LEFT,
-        RIGHT;
-
-        @NonNull
-        @Override
-        public String toString() {
-            switch (this) {
-                case LEFT:
-                    return "Left";
-                case RIGHT:
-                    return "Right";
-                default:
-                    throw new IllegalArgumentException();
-            }
-        }
-    }
-
-    public Alliance alliance;
-    public StartingLocation startingLocation;
+    public AutoMode autoMode;
 
     private final Robot robot = new Robot(this);
     private final AutoRobot autoRobot = new AutoRobot(this, robot);
 
-    public Auto(Alliance alliance, StartingLocation startingLocation) {
-        this.alliance = alliance;
-        this.startingLocation = startingLocation;
+    public Auto(AutoMode autoMode) {
+        this.autoMode = autoMode;
     }
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Alliance", alliance);
-        telemetry.addData("Starting Location", startingLocation);
+        telemetry.addData("Auto Mode", autoMode);
         telemetry.update();
         robot.init();
         waitForStart();
-        if (alliance == Alliance.RED) {
-            // flip direction
-        }
-        if (startingLocation == StartingLocation.LEFT) {
-            // left auto
-        } else {
-            // right auto
-        }
 
         robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
         sleep(1000);
 
-        robot.armMotor.setTargetPosition(1070);
-        robot.armMotor.setPower(0.2);
-        robot.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        autoRobot.drive(1900, 0.1, 0.3);
-//        robot.liftMotor.setTargetPosition(800);
-//        robot.liftMotor.setPower(0.5);
-//        robot.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        while (robot.liftMotor.isBusy()) {
-//            telemetry.update();
-//        }
-//        robot.liftMotor.setTargetPosition(0);
-        robot.armMotor.setTargetPosition(700);
-        robot.armMotor.setPower(0.2);
-        autoRobot.drive(-900, 0, 0);
+        if (autoMode == AutoMode.SPECIMEN) {
+            robot.armMotor.setTargetPosition(ARM_POSITION);
+            robot.armMotor.setPower(0.2);
+            robot.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            autoRobot.drive(1900, DRiVE_SPEED);
+            robot.armMotor.setTargetPosition(700);
+            robot.armMotor.setPower(0.2);
+            autoRobot.drive(-900, DRiVE_SPEED);
 
-        robot.claw.setPosition(Robot.CLAW_OPEN_POSITION);
-        autoRobot.drive(-700, 0, 0);
-        autoRobot.strafe(3000);
-        while (opModeIsActive()) {
-
+            robot.claw.setPosition(Robot.CLAW_OPEN_POSITION);
+            autoRobot.drive(-700, DRiVE_SPEED);
+            autoRobot.strafe(SPECIMEN_PARK_DISTANCE);
+        } else if (autoMode == AutoMode.PARK) {
+            autoRobot.drive(200, DRiVE_SPEED);
+            autoRobot.strafe(PARK_STRAFE_DISTANCE);
         }
-        //        autoRobot.strafe(1000);
+
+
+        while (opModeIsActive()) {
+            telemetry.addLine("Auto Complete");
+            telemetry.update();
+        }
     }
 
     @OpModeRegistrar
     public static void register(OpModeManager manager) {
-        for (Alliance selectedAlliance : Alliance.values()) {
-            for (StartingLocation selectedStartingLocation : StartingLocation.values()) {
-                OpModeMeta meta = new OpModeMeta.Builder()
-                        .setName(String.format("%s / %s", selectedAlliance, selectedStartingLocation))
-                        .setGroup(selectedAlliance.toString())
-                        .setFlavor(OpModeMeta.Flavor.AUTONOMOUS)
-                        .setTransitionTarget("TeleOp")
-                        .build();
+        for (AutoMode autoMode : AutoMode.values()) {
+            OpModeMeta meta = new OpModeMeta.Builder()
+                    .setName(String.format("Auto - %s", autoMode))
+                    .setFlavor(OpModeMeta.Flavor.AUTONOMOUS)
+                    .setTransitionTarget("TeleOp")
+                    .build();
 
-                manager.register(meta, new Auto(selectedAlliance, selectedStartingLocation));
-            }
+            manager.register(meta, new Auto(autoMode));
         }
     }
 }
