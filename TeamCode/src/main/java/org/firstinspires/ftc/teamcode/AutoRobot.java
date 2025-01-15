@@ -20,7 +20,7 @@ public class AutoRobot {
         this.robot = robot;
     }
 
-    public void drive(double distance, double maxAcceleration, double maxVelocity) {
+    public void drive(double distance, double power) {
         if (opMode.opModeIsActive()) {
             int moveCounts = (int) (distance * COUNTS_PER_INCH);
             int frontLeftStartPosition = robot.frontLeftMotor.getCurrentPosition();
@@ -53,16 +53,11 @@ public class AutoRobot {
                     robot.backLeftMotor.isBusy() &&
                     robot.backRightMotor.isBusy()) {
 
-                elapsedTime = runtime.seconds();
+                robot.frontLeftMotor.setPower(power);
+                robot.frontRightMotor.setPower(power);
+                robot.backLeftMotor.setPower(power);
+                robot.backRightMotor.setPower(power);
 
-                robot.frontLeftMotor.setPower(0.2);
-                robot.frontRightMotor.setPower(0.2);
-                robot.backLeftMotor.setPower(0.2);
-                robot.backRightMotor.setPower(0.2);
-
-//                opMode.telemetry.addData("Target Position", targetPosition);
-//                opMode.telemetry.addData("Current Position", currentPosition);
-//                opMode.telemetry.addData("Motor Power", motorPower);
                 opMode.telemetry.update();
             }
 
@@ -79,7 +74,7 @@ public class AutoRobot {
         }
     }
 
-    public void strafe(double distance) {
+    public void strafe(double distance, double power) {
         if (opMode.opModeIsActive()) {
             int moveCounts = (int) (distance * COUNTS_PER_INCH);
             int frontLeftStartPosition = robot.frontLeftMotor.getCurrentPosition();
@@ -102,9 +97,6 @@ public class AutoRobot {
             robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            // Initialize motion profile parameters
-            double elapsedTime = 0;
-
             ElapsedTime runtime = new ElapsedTime();
 
             while (opMode.opModeIsActive() && robot.frontLeftMotor.isBusy() &&
@@ -112,16 +104,11 @@ public class AutoRobot {
                     robot.backLeftMotor.isBusy() &&
                     robot.backRightMotor.isBusy()) {
 
-                elapsedTime = runtime.seconds();
+                robot.frontLeftMotor.setPower(power);
+                robot.frontRightMotor.setPower(power);
+                robot.backLeftMotor.setPower(power);
+                robot.backRightMotor.setPower(power);
 
-                robot.frontLeftMotor.setPower(0.2);
-                robot.frontRightMotor.setPower(0.2);
-                robot.backLeftMotor.setPower(0.2);
-                robot.backRightMotor.setPower(0.2);
-
-//                opMode.telemetry.addData("Target Position", targetPosition);
-//                opMode.telemetry.addData("Current Position", currentPosition);
-//                opMode.telemetry.addData("Motor Power", motorPower);
                 opMode.telemetry.update();
             }
 
