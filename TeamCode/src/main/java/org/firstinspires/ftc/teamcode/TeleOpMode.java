@@ -92,7 +92,7 @@ public class TeleOpMode extends GamepadOpMode {
             fieldCentric = !fieldCentric;
         }
         if (fieldCentric) {
-            robot.updateMecanumFieldDrive(-gamepad1.left_stick_y * driveFactor, gamepad1.left_stick_x * driveFactor, gamepad1.right_stick_x * turnFactor);
+            robot.updateMecanumFieldDrive(-stickDeadZoneComp(gamepad1.left_stick_y, 0.1) * driveFactor, stickDeadZoneComp(gamepad1.left_stick_x, 0.1) * driveFactor, stickDeadZoneComp(gamepad1.right_stick_x, 0.1) * turnFactor);
         } else {
             robot.updateMecanumRobotDrive(-gamepad1.left_stick_y * driveFactor, gamepad1.left_stick_x * driveFactor, gamepad1.right_stick_x * turnFactor);
         }
