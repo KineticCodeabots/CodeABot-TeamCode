@@ -50,10 +50,10 @@ public class Auto extends LinearOpMode {
 
             robot.claw.setPosition(Robot.CLAW_OPEN_POSITION);
             autoRobot.drive(-700, DRiVE_SPEED);
-            autoRobot.strafe(SPECIMEN_PARK_DISTANCE);
+            autoRobot.strafe(SPECIMEN_PARK_DISTANCE, DRiVE_SPEED);
         } else if (autoMode == AutoMode.PARK) {
             autoRobot.drive(200, DRiVE_SPEED);
-            autoRobot.strafe(PARK_STRAFE_DISTANCE);
+            autoRobot.strafe(PARK_STRAFE_DISTANCE, DRiVE_SPEED);
         }
 
 
