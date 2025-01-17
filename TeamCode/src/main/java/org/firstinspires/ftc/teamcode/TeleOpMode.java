@@ -24,6 +24,8 @@ public class TeleOpMode extends GamepadOpMode {
     public static int MAX_LIFT_POSITION_HORIZONTAL = 1000;
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
+    public static int ARM_MAX_POSITION = 1200;
+    public static int ARM_SLOWDOWN_DISTANCE = 100;
 
     final double ARM_TICKS_PER_REV =
             ((20.0) // HD Hex Motor 20:1 Planetary Gearbox
@@ -157,7 +159,7 @@ public class TeleOpMode extends GamepadOpMode {
         armCommand = armOperatorInput;
         if (armCommand < 0) {
             if (armPrecisionMode) {
-                armCommand *= Math.max(armAntiGravityCommand * 2, 0.01);
+                armCommand *= Math.max(armAntiGravityCommand * 1.5, 0.01);
             } else {
                 armCommand *= ARM_DOWN_POWER;
             }
@@ -170,6 +172,9 @@ public class TeleOpMode extends GamepadOpMode {
         }
 
         armCommand += armAntiGravityCommand;
+        if (!operatorLimitsDisabled && robot.armMotor.getCurrentPosition() > ARM_MAX_POSITION - ARM_SLOWDOWN_DISTANCE) {
+            armCommand = Math.min(armCommand, Math.max((double) (ARM_MAX_POSITION - robot.armMotor.getCurrentPosition()) / ARM_SLOWDOWN_DISTANCE, 0));
+        }
 
         if (debugMode) telemetry.addData("Arm Anti Gravity", armAntiGravityCommand);
 
