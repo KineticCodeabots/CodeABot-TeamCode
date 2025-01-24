@@ -71,12 +71,12 @@ public class AutoConfigurator extends LinearOpMode {
                     Auto.DRiVE_SPEED = Math.min(1.0, Auto.DRiVE_SPEED + 0.1);
                 } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
                     Auto.DRiVE_SPEED = Math.max(0.0, Auto.DRiVE_SPEED - 0.1);
-                } else if (Objects.equals(selectedEntry.getKey(), "Drive Forward Distance")) {
-                    if (gamepad.dpad_right && !previousGamepad.dpad_right) {
-                        Auto.DRIVE_FORWARD_DISTANCE += 100;
-                    } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
-                        Auto.DRIVE_FORWARD_DISTANCE = Auto.DRIVE_FORWARD_DISTANCE - 100;
-                    }
+                }
+            } else if (Objects.equals(selectedEntry.getKey(), "Drive Forward Distance")) {
+                if (gamepad.dpad_right && !previousGamepad.dpad_right) {
+                    Auto.DRIVE_FORWARD_DISTANCE += 100;
+                } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
+                    Auto.DRIVE_FORWARD_DISTANCE = Auto.DRIVE_FORWARD_DISTANCE - 100;
                 }
             } else if (Objects.equals(selectedEntry.getKey(), "Park Strafe Distance")) {
                 if (gamepad.dpad_right && !previousGamepad.dpad_right) {
