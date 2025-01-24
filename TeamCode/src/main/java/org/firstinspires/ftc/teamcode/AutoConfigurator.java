@@ -24,6 +24,7 @@ public class AutoConfigurator extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
         // large bold text saying Auto Configurator
         telemetry.addLine("<font size=\"5\"><b>Auto Configurator</b></font>");
+        waitForStart();
         while (opModeIsActive()) {
             byte[] gamepad1Data = gamepad1.toByteArray();
             byte[] gamepad2Data = gamepad2.toByteArray();
@@ -47,18 +48,21 @@ public class AutoConfigurator extends LinearOpMode {
                 Auto.SPECIMEN_PARK_DISTANCE = 3000;
             }
 
-            if (gamepad.dpad_up && !previousGamepad.dpad_up) {
-                selectedConfigurationIndex = Math.max(0, selectedConfigurationIndex - 1);
-            } else if (gamepad.dpad_down && !previousGamepad.dpad_down) {
-                selectedConfigurationIndex = Math.min(selectedConfigurationIndex + 1, 2);
-            }
 
             Map<String, Object> configurations = new LinkedHashMap<>();
             configurations.put("Speed", Auto.DRiVE_SPEED);
+            configurations.put("Drive Forward Distance", Auto.DRIVE_FORWARD_DISTANCE);
             configurations.put("Park Strafe Distance", Auto.PARK_STRAFE_DISTANCE);
             configurations.put("Specimen Park Distance", Auto.SPECIMEN_PARK_DISTANCE);
+            configurations.put("Do Park", Auto.DO_PARK);
 
             List<Map.Entry<String, Object>> entryList = new ArrayList<>(configurations.entrySet());
+
+            if (gamepad.dpad_up && !previousGamepad.dpad_up) {
+                selectedConfigurationIndex = Math.max(0, selectedConfigurationIndex - 1);
+            } else if (gamepad.dpad_down && !previousGamepad.dpad_down) {
+                selectedConfigurationIndex = Math.min(selectedConfigurationIndex + 1, configurations.size() - 1);
+            }
 
             Map.Entry<String, Object> selectedEntry = entryList.get(selectedConfigurationIndex);
 
@@ -67,6 +71,12 @@ public class AutoConfigurator extends LinearOpMode {
                     Auto.DRiVE_SPEED = Math.min(1.0, Auto.DRiVE_SPEED + 0.1);
                 } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
                     Auto.DRiVE_SPEED = Math.max(0.0, Auto.DRiVE_SPEED - 0.1);
+                } else if (Objects.equals(selectedEntry.getKey(), "Drive Forward Distance")) {
+                    if (gamepad.dpad_right && !previousGamepad.dpad_right) {
+                        Auto.DRIVE_FORWARD_DISTANCE += 100;
+                    } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
+                        Auto.DRIVE_FORWARD_DISTANCE = Auto.DRIVE_FORWARD_DISTANCE - 100;
+                    }
                 }
             } else if (Objects.equals(selectedEntry.getKey(), "Park Strafe Distance")) {
                 if (gamepad.dpad_right && !previousGamepad.dpad_right) {
@@ -80,6 +90,12 @@ public class AutoConfigurator extends LinearOpMode {
                 } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
                     Auto.SPECIMEN_PARK_DISTANCE = Auto.SPECIMEN_PARK_DISTANCE - 100;
                 }
+            } else if (Objects.equals(selectedEntry.getKey(), "Do Park")) {
+                if (gamepad.dpad_right && !previousGamepad.dpad_right) {
+                    Auto.DO_PARK = !Auto.DO_PARK;
+                } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
+                    Auto.DO_PARK = !Auto.DO_PARK;
+                }
             }
 
             int index = 0;
@@ -89,6 +105,7 @@ public class AutoConfigurator extends LinearOpMode {
                 } else {
                     telemetry.addData(entry.getKey(), entry.getValue());
                 }
+                index++;
             }
 
             telemetry.addLine("<font color=\"red\">(X) to reset</font>");
