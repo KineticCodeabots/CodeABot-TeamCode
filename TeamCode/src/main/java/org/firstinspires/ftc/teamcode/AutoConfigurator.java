@@ -43,18 +43,17 @@ public class AutoConfigurator extends LinearOpMode {
 
 
             if (gamepad.x && !previousGamepad.x) {
-                Auto.DRiVE_SPEED = 0.3;
+                Auto.DRIVE_SPEED = 0.3;
                 Auto.PARK_STRAFE_DISTANCE = 2000;
                 Auto.SPECIMEN_PARK_DISTANCE = 3000;
             }
 
 
             Map<String, Object> configurations = new LinkedHashMap<>();
-            configurations.put("Speed", Auto.DRiVE_SPEED);
+            configurations.put("Speed", Auto.DRIVE_SPEED);
             configurations.put("Drive Forward Distance", Auto.DRIVE_FORWARD_DISTANCE);
             configurations.put("Park Strafe Distance", Auto.PARK_STRAFE_DISTANCE);
             configurations.put("Specimen Park Distance", Auto.SPECIMEN_PARK_DISTANCE);
-            configurations.put("Do Park", Auto.DO_PARK);
 
             List<Map.Entry<String, Object>> entryList = new ArrayList<>(configurations.entrySet());
 
@@ -68,9 +67,9 @@ public class AutoConfigurator extends LinearOpMode {
 
             if (Objects.equals(selectedEntry.getKey(), "Speed")) {
                 if (gamepad.dpad_right && !previousGamepad.dpad_right) {
-                    Auto.DRiVE_SPEED = Math.min(1.0, Auto.DRiVE_SPEED + 0.1);
+                    Auto.DRIVE_SPEED = Math.min(1.0, Auto.DRIVE_SPEED + 0.1);
                 } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
-                    Auto.DRiVE_SPEED = Math.max(0.0, Auto.DRiVE_SPEED - 0.1);
+                    Auto.DRIVE_SPEED = Math.max(0.0, Auto.DRIVE_SPEED - 0.1);
                 }
             } else if (Objects.equals(selectedEntry.getKey(), "Drive Forward Distance")) {
                 if (gamepad.dpad_right && !previousGamepad.dpad_right) {
@@ -89,12 +88,6 @@ public class AutoConfigurator extends LinearOpMode {
                     Auto.SPECIMEN_PARK_DISTANCE += 100;
                 } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
                     Auto.SPECIMEN_PARK_DISTANCE = Auto.SPECIMEN_PARK_DISTANCE - 100;
-                }
-            } else if (Objects.equals(selectedEntry.getKey(), "Do Park")) {
-                if (gamepad.dpad_right && !previousGamepad.dpad_right) {
-                    Auto.DO_PARK = !Auto.DO_PARK;
-                } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
-                    Auto.DO_PARK = !Auto.DO_PARK;
                 }
             }
 
