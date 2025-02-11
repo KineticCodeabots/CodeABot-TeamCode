@@ -98,14 +98,17 @@ public class Auto extends LinearOpMode {
     public static void register(OpModeManager manager) {
         for (AutoStart autoStart : AutoStart.values()) {
             for (AutoEnding autoEnding : AutoEnding.values()) {
+                String name = (autoStart == AutoStart.NONE)
+                        ? autoEnding.toString()
+                        : String.format("%s -> %s", autoStart, autoEnding);
+
                 OpModeMeta meta = new OpModeMeta.Builder()
-                        .setName(String.format("%s -> %s", autoStart, autoEnding))
+                        .setName(name)
                         .setFlavor(OpModeMeta.Flavor.AUTONOMOUS)
                         .setTransitionTarget("TeleOp")
                         .build();
 
                 manager.register(meta, new Auto(autoStart, autoEnding));
-
             }
         }
     }
