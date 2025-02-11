@@ -9,10 +9,11 @@ import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 
 public class Auto extends LinearOpMode {
     public static int DRIVE_FORWARD_DISTANCE = 1600;
-    public static int ARM_POSITION = 1070;
+    public static int SPECIMEN_ARM_POSITION = 1070;
     public static double DRIVE_SPEED = 0.3;
-    public static int PARK_STRAFE_DISTANCE = 2000;
-    public static int SPECIMEN_PARK_DISTANCE = 3000;
+    public static int PARK_STRAFE_DISTANCE = 3000;
+    public static int SAMPLE_PICKUP_STRAFE_DISTANCE = 2800;
+    public static long START_DELAY = 0;
 
     public enum AutoStart {
         SPECIMEN,
@@ -40,13 +41,15 @@ public class Auto extends LinearOpMode {
         telemetry.addData("Auto Mode", autoStart);
         telemetry.update();
         robot.init();
+        robot.reset();
         waitForStart();
+        sleep(START_DELAY);
 
         robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
         sleep(1000);
 
         if (autoStart == AutoStart.SPECIMEN) {
-            robot.armMotor.setTargetPosition(ARM_POSITION);
+            robot.armMotor.setTargetPosition(SPECIMEN_ARM_POSITION);
             robot.armMotor.setPower(0.3);
             robot.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             autoRobot.drive(DRIVE_FORWARD_DISTANCE, DRIVE_SPEED);
@@ -58,17 +61,14 @@ public class Auto extends LinearOpMode {
             robot.armMotor.setTargetPosition(100);
             robot.armMotor.setPower(0.1);
             autoRobot.drive(-700, DRIVE_SPEED);
-
-
         } else {
-            autoRobot.drive(200, DRIVE_SPEED);
-
+            autoRobot.drive(300, DRIVE_SPEED);
         }
         if (autoEnding == AutoEnding.PARK) {
-            autoRobot.strafe(SPECIMEN_PARK_DISTANCE, DRIVE_SPEED);
+            autoRobot.strafe(PARK_STRAFE_DISTANCE, DRIVE_SPEED);
         } else if (autoEnding == AutoEnding.SAMPLE_PICKUP) {
-            autoRobot.strafe(2800, DRIVE_SPEED);
-            autoRobot.drive(900, DRIVE_SPEED);
+            autoRobot.strafe(SAMPLE_PICKUP_STRAFE_DISTANCE, 0.25);
+            autoRobot.drive(900, 0.2);
 
             robot.armMotor.setTargetPosition(100);
             robot.armMotor.setPower(0.1);
@@ -99,7 +99,7 @@ public class Auto extends LinearOpMode {
         for (AutoStart autoStart : AutoStart.values()) {
             for (AutoEnding autoEnding : AutoEnding.values()) {
                 OpModeMeta meta = new OpModeMeta.Builder()
-                        .setName(String.format("Auto - %s - %s", autoStart, autoEnding))
+                        .setName(String.format("%s -> %s", autoStart, autoEnding))
                         .setFlavor(OpModeMeta.Flavor.AUTONOMOUS)
                         .setTransitionTarget("TeleOp")
                         .build();

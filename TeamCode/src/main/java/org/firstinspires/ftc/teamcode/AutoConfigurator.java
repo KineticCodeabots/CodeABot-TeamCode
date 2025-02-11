@@ -44,8 +44,9 @@ public class AutoConfigurator extends LinearOpMode {
 
             if (gamepad.x && !previousGamepad.x) {
                 Auto.DRIVE_SPEED = 0.3;
+                Auto.DRIVE_FORWARD_DISTANCE = 1600;
                 Auto.PARK_STRAFE_DISTANCE = 2000;
-                Auto.SPECIMEN_PARK_DISTANCE = 3000;
+                Auto.START_DELAY = 0;
             }
 
 
@@ -53,7 +54,8 @@ public class AutoConfigurator extends LinearOpMode {
             configurations.put("Speed", Auto.DRIVE_SPEED);
             configurations.put("Drive Forward Distance", Auto.DRIVE_FORWARD_DISTANCE);
             configurations.put("Park Strafe Distance", Auto.PARK_STRAFE_DISTANCE);
-            configurations.put("Specimen Park Distance", Auto.SPECIMEN_PARK_DISTANCE);
+            configurations.put("Sample Pickup Strafe Distance", Auto.SAMPLE_PICKUP_STRAFE_DISTANCE);
+            configurations.put("Start Delay", Auto.START_DELAY);
 
             List<Map.Entry<String, Object>> entryList = new ArrayList<>(configurations.entrySet());
 
@@ -67,9 +69,9 @@ public class AutoConfigurator extends LinearOpMode {
 
             if (Objects.equals(selectedEntry.getKey(), "Speed")) {
                 if (gamepad.dpad_right && !previousGamepad.dpad_right) {
-                    Auto.DRIVE_SPEED = Math.min(1.0, Auto.DRIVE_SPEED + 0.1);
+                    Auto.DRIVE_SPEED = Math.min(1.0, Auto.DRIVE_SPEED + 0.05);
                 } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
-                    Auto.DRIVE_SPEED = Math.max(0.0, Auto.DRIVE_SPEED - 0.1);
+                    Auto.DRIVE_SPEED = Math.max(0.0, Auto.DRIVE_SPEED - 0.05);
                 }
             } else if (Objects.equals(selectedEntry.getKey(), "Drive Forward Distance")) {
                 if (gamepad.dpad_right && !previousGamepad.dpad_right) {
@@ -83,11 +85,17 @@ public class AutoConfigurator extends LinearOpMode {
                 } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
                     Auto.PARK_STRAFE_DISTANCE = Auto.PARK_STRAFE_DISTANCE - 100;
                 }
-            } else if (Objects.equals(selectedEntry.getKey(), "Specimen Park Distance")) {
+            } else if (Objects.equals(selectedEntry.getKey(), "Sample Pickup Strafe Distance")) {
                 if (gamepad.dpad_right && !previousGamepad.dpad_right) {
-                    Auto.SPECIMEN_PARK_DISTANCE += 100;
+                    Auto.SAMPLE_PICKUP_STRAFE_DISTANCE += 100;
                 } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
-                    Auto.SPECIMEN_PARK_DISTANCE = Auto.SPECIMEN_PARK_DISTANCE - 100;
+                    Auto.SAMPLE_PICKUP_STRAFE_DISTANCE = Auto.SAMPLE_PICKUP_STRAFE_DISTANCE - 100;
+                }
+            } else if (Objects.equals(selectedEntry.getKey(), "Start Delay")) {
+                if (gamepad.dpad_right && !previousGamepad.dpad_right) {
+                    Auto.START_DELAY += 500;
+                } else if (gamepad.dpad_left && !previousGamepad.dpad_left) {
+                    Auto.START_DELAY = Auto.START_DELAY - 500;
                 }
             }
 
