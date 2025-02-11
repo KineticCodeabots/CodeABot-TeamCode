@@ -20,11 +20,12 @@ public class TeleOpMode extends GamepadOpMode {
     public static double MAX_DRIVE_SPEED = 0.5;
     public static double MAX_TURN_SPEED = 0.4;
     public static double PRECISION_SPEED = 0.2;
-    public static int MAX_LIFT_POSITION = 1500;
+    public static int MAX_LIFT_POSITION = 1400;
+    
     public static int MAX_LIFT_POSITION_HORIZONTAL = 1100;
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
-    public static int ARM_MAX_POSITION = 1300;
+    public static int ARM_MAX_POSITION = 1250;
     public static int ARM_SLOWDOWN_DISTANCE = 100;
 
     final double ARM_TICKS_PER_REV =
