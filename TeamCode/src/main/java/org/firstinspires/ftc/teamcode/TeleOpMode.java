@@ -24,7 +24,7 @@ public class TeleOpMode extends GamepadOpMode {
     public static int MAX_LIFT_POSITION_HORIZONTAL = 1100;
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
-    public static int ARM_MAX_POSITION = 1200;
+    public static int ARM_MAX_POSITION = 1300;
     public static int ARM_SLOWDOWN_DISTANCE = 100;
 
     final double ARM_TICKS_PER_REV =
@@ -60,6 +60,11 @@ public class TeleOpMode extends GamepadOpMode {
         robot.liftMotor.setCurrentAlert(5, CurrentUnit.AMPS);
         telemetry.addData("<b>Status</b>", "<font color='green'>Initialized</font>");
         telemetry.update();
+    }
+
+    @Override
+    public void start() {
+        robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
     }
 
     @Override
@@ -200,11 +205,11 @@ public class TeleOpMode extends GamepadOpMode {
         if (!currentGamepad2.start) {
             if (currentGamepad2.y && !previousGamepad1.y) {
                 liftMoveToPosition = true;
-                liftTargetPosition = 1350;
+                liftTargetPosition = MAX_LIFT_POSITION;
                 liftPositionPID.reset();
             } else if (currentGamepad2.b && !previousGamepad2.b) {
                 liftMoveToPosition = true;
-                liftTargetPosition = 350;
+                liftTargetPosition = 400;
                 liftPositionPID.reset();
             } else if (currentGamepad2.a && !previousGamepad1.a) {
                 liftMoveToPosition = true;

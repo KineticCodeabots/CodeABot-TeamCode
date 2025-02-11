@@ -43,11 +43,6 @@ public class AutoRobot {
             robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            // Initialize motion profile parameters
-            double elapsedTime = 0;
-
-            ElapsedTime runtime = new ElapsedTime();
-
             while (opMode.opModeIsActive() && robot.frontLeftMotor.isBusy() &&
                     robot.frontRightMotor.isBusy() &&
                     robot.backLeftMotor.isBusy() &&
@@ -96,8 +91,6 @@ public class AutoRobot {
             robot.frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            ElapsedTime runtime = new ElapsedTime();
 
             while (opMode.opModeIsActive() && robot.frontLeftMotor.isBusy() &&
                     robot.frontRightMotor.isBusy() &&

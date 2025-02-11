@@ -54,13 +54,11 @@ public class Robot {
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         frontRightMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
@@ -81,7 +79,15 @@ public class Robot {
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
         imu.initialize(parameters);
+    }
 
+    public void reset() {
+        DcMotor.RunMode armMotorRunMode = armMotor.getMode();
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(armMotorRunMode);
+        DcMotor.RunMode liftMotorRunMode = liftMotor.getMode();
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(liftMotorRunMode);
     }
 
     void updateMecanumRobotDrive(double drive, double strafe, double turn) {
