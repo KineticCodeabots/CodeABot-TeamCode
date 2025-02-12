@@ -21,7 +21,7 @@ public class TeleOpMode extends GamepadOpMode {
     public static double MAX_TURN_SPEED = 0.4;
     public static double PRECISION_SPEED = 0.2;
     public static int MAX_LIFT_POSITION = 1400;
-    
+
     public static int MAX_LIFT_POSITION_HORIZONTAL = 1100;
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
@@ -137,6 +137,9 @@ public class TeleOpMode extends GamepadOpMode {
         if (currentGamepad2.left_stick_button && !previousGamepad2.left_stick_button) {
             robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+        if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+            armAntiGravityPID.reset();
         }
         armPrecisionMode = currentGamepad2.left_bumper;
         if (armPrecisionMode) {
