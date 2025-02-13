@@ -20,13 +20,13 @@ public class TeleOpMode extends GamepadOpMode {
     public static double MAX_DRIVE_SPEED = 0.5;
     public static double MAX_TURN_SPEED = 0.4;
     public static double PRECISION_SPEED = 0.2;
-    public static int MAX_LIFT_POSITION = 1400;
+    public static int MAX_LIFT_POSITION = 1200;
 
     public static int MAX_LIFT_POSITION_HORIZONTAL = 1100;
     public static int LIFT_SLOWDOWN_DISTANCE = 50;
     public static double ARM_ANGLE_OFFSET = -0.5;
-    public static int ARM_MAX_POSITION = 1250;
-    public static int ARM_SLOWDOWN_DISTANCE = 100;
+    public static int ARM_MAX_POSITION = 1200;
+    public static int ARM_SLOWDOWN_DISTANCE = 150;
 
     final double ARM_TICKS_PER_REV =
             ((20.0) // HD Hex Motor 20:1 Planetary Gearbox
@@ -37,7 +37,7 @@ public class TeleOpMode extends GamepadOpMode {
 
     // Robot and PID controllers
     private final Robot robot = new Robot(this);
-    private final PID armAntiGravityPID = new ArmAGPID(0, 0.0004, 0);
+    private final PID armAntiGravityPID = new ArmAGPID(0, 0.0007, 0);
     private final PID liftPositionPID = new PIDAW(0.1, 0.001, 0);
 
     // State variables
@@ -65,7 +65,7 @@ public class TeleOpMode extends GamepadOpMode {
 
     @Override
     public void start() {
-        robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
+        robot.toggleClaw();
     }
 
     @Override
@@ -153,12 +153,11 @@ public class TeleOpMode extends GamepadOpMode {
         if (!currentGamepad2.right_bumper) {
             // Prevent arm from moving when it should not be moving, and limiting the force applied to hopefully not get shock loads idk.
             if (armOperatorInput == 0) {
-                if (Math.abs(robot.armMotor.getVelocity()) > 200) {
+                if (Math.abs(robot.armMotor.getVelocity()) > 500) {
                     armAntiGravityCommand = 0;
                 } else {
-                    armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -100, 100));
+                    armAntiGravityCommand = armAntiGravityPID.update(0, Range.clip(robot.armMotor.getVelocity(), -100, 150));
                 }
-
             } else {
                 armAntiGravityCommand = armAntiGravityPID.update(0, 0);
             }
