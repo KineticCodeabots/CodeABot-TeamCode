@@ -42,13 +42,19 @@ public class Auto extends LinearOpMode {
         telemetry.update();
         robot.init();
         robot.reset();
+//        robot.claw.getController().pwmEnable();
+        if (autoStart == AutoStart.SPECIMEN) {
+            robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
+        }
         waitForStart();
+        // drive: 45.5
+        // strafe: 42
+
         sleep(START_DELAY);
 
-        robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
-        sleep(1000);
-
         if (autoStart == AutoStart.SPECIMEN) {
+            robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
+//            sleep(3000);
             robot.armMotor.setTargetPosition(SPECIMEN_ARM_POSITION);
             robot.armMotor.setPower(0.3);
             robot.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -67,12 +73,13 @@ public class Auto extends LinearOpMode {
         if (autoEnding == AutoEnding.PARK) {
             autoRobot.strafe(PARK_STRAFE_DISTANCE, DRIVE_SPEED);
         } else if (autoEnding == AutoEnding.SAMPLE_PICKUP) {
-            autoRobot.strafe(SAMPLE_PICKUP_STRAFE_DISTANCE, 0.25);
-            autoRobot.drive(900, 0.2);
-
+            robot.claw.setPosition(Robot.CLAW_OPEN_POSITION);
             robot.armMotor.setTargetPosition(100);
-            robot.armMotor.setPower(0.1);
+            robot.armMotor.setPower(0.2);
             robot.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            autoRobot.strafe(SAMPLE_PICKUP_STRAFE_DISTANCE, 0.25);
+            autoRobot.drive(1000, 0.2);
+
             robot.liftMotor.setTargetPosition(400);
             robot.liftMotor.setPower(0.8);
             robot.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -84,7 +91,7 @@ public class Auto extends LinearOpMode {
             robot.armMotor.setTargetPosition(200);
             robot.armMotor.setPower(0.2);
             sleep(200);
-            autoRobot.drive(-900, DRIVE_SPEED);
+            autoRobot.drive(-1000, DRIVE_SPEED);
         }
 
 
