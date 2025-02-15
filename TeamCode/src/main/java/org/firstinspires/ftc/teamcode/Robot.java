@@ -88,6 +88,8 @@ public class Robot {
         DcMotor.RunMode liftMotorRunMode = liftMotor.getMode();
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(liftMotorRunMode);
+
+        imu.resetYaw();
     }
 
     void updateMecanumRobotDrive(double drive, double strafe, double turn) {

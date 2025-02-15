@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 
 public class Auto extends LinearOpMode {
@@ -23,6 +24,7 @@ public class Auto extends LinearOpMode {
     public enum AutoEnding {
         PARK,
         SAMPLE_PICKUP,
+        LEVEL_1_PARK
     }
 
     public AutoStart autoStart;
@@ -42,6 +44,7 @@ public class Auto extends LinearOpMode {
         telemetry.update();
         robot.init();
         robot.reset();
+//        telemetry.addLine(String.valueOf(robot.armMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION)));
 //        robot.claw.getController().pwmEnable();
         if (autoStart == AutoStart.SPECIMEN) {
             robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
@@ -53,6 +56,7 @@ public class Auto extends LinearOpMode {
         sleep(START_DELAY);
 
         if (autoStart == AutoStart.SPECIMEN) {
+
             robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
 //            sleep(3000);
             robot.armMotor.setTargetPosition(SPECIMEN_ARM_POSITION);
@@ -65,20 +69,56 @@ public class Auto extends LinearOpMode {
 
             robot.claw.setPosition(Robot.CLAW_OPEN_POSITION);
             robot.armMotor.setTargetPosition(100);
-            robot.armMotor.setPower(0.1);
+            robot.armMotor.setPower(0.2);
             autoRobot.drive(-700, DRIVE_SPEED);
         } else {
             autoRobot.drive(300, DRIVE_SPEED);
         }
         if (autoEnding == AutoEnding.PARK) {
+
             autoRobot.strafe(PARK_STRAFE_DISTANCE, DRIVE_SPEED);
+        } else if (autoEnding == AutoEnding.LEVEL_1_PARK) {
+            robot.armMotor.setTargetPosition(800);
+            robot.armMotor.setPower(0.3);
+            autoRobot.strafe(-2000, DRIVE_SPEED);
+            autoRobot.drive(2800, DRIVE_SPEED);
+            robot.frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            robot.frontLeftMotor.setPower(0.3);
+            robot.backLeftMotor.setPower(0.3);
+            robot.frontRightMotor.setPower(-0.3);
+            robot.backRightMotor.setPower(-0.3);
+
+            while (true) {
+                double botHeading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+                telemetry.addData("Bot Heading", botHeading);
+                telemetry.update();
+                // right 90 degree turn
+                if (botHeading < -90) {
+                    break;
+                }
+
+            }
+            robot.frontLeftMotor.setPower(0);
+            robot.backLeftMotor.setPower(0);
+            robot.frontRightMotor.setPower(0);
+            robot.backRightMotor.setPower(0);
+
+            autoRobot.drive(1000, DRIVE_SPEED);
+
+            robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.armMotor.setPower(0);
+
         } else if (autoEnding == AutoEnding.SAMPLE_PICKUP) {
             robot.claw.setPosition(Robot.CLAW_OPEN_POSITION);
             robot.armMotor.setTargetPosition(100);
             robot.armMotor.setPower(0.2);
             robot.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             autoRobot.strafe(SAMPLE_PICKUP_STRAFE_DISTANCE, 0.25);
-            autoRobot.drive(1000, 0.2);
+            autoRobot.drive(750, 0.2);
 
             robot.liftMotor.setTargetPosition(400);
             robot.liftMotor.setPower(0.8);
@@ -86,12 +126,15 @@ public class Auto extends LinearOpMode {
             while (robot.liftMotor.isBusy()) {
 
             }
+            robot.armMotor.setTargetPosition(0);
+            robot.armMotor.setPower(0.1);
+            sleep(500);
             robot.claw.setPosition(Robot.CLAW_CLOSED_POSITION);
             sleep(500);
             robot.armMotor.setTargetPosition(200);
             robot.armMotor.setPower(0.2);
             sleep(200);
-            autoRobot.drive(-1000, DRIVE_SPEED);
+            autoRobot.drive(-750, DRIVE_SPEED);
         }
 
 

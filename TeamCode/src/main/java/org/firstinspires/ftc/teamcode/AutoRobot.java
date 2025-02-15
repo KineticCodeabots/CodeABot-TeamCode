@@ -117,6 +117,9 @@ public class AutoRobot {
             robot.backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
+//    public void turn(double angle, double power) {
+//
+//    }
 
     // Trapezoidal motion profile method
     private double motionProfile(double maxAcceleration, double maxVelocity, double distance, double elapsedTime) {
