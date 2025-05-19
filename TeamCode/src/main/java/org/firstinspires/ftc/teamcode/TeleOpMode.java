@@ -80,6 +80,14 @@ public class TeleOpMode extends GamepadOpMode {
 
         driverLoop();
         operatorLoop();
+
+        if (gamepad2.dpad_up && !gamepad2.right_stick_button) {
+            robot.wristMotor.setPower(.25);
+        } else if (gamepad2.dpad_down && !gamepad2.right_stick_button) {
+            robot.wristMotor.setPower(-.25);
+        } else {
+            robot.wristMotor.setPower(0);
+        }
     }
 
     private void driverLoop() {
@@ -138,7 +146,7 @@ public class TeleOpMode extends GamepadOpMode {
             robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-        if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+        if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
             armAntiGravityPID.reset();
         }
         armPrecisionMode = currentGamepad2.left_bumper;
@@ -162,6 +170,7 @@ public class TeleOpMode extends GamepadOpMode {
                 armAntiGravityCommand = armAntiGravityPID.update(0, 0);
             }
         }
+
 
         double armCommand;
         armCommand = armOperatorInput;
