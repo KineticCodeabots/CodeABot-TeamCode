@@ -15,8 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
 public class Robot {
-    public static double CLAW_OPEN_POSITION = 0.2;
-    public static double CLAW_CLOSED_POSITION = 0.47;
+    public static double CLAW_OPEN_POSITION = 0.7;
+    public static double CLAW_CLOSED_POSITION = 0.1;
     public static DcMotor.ZeroPowerBehavior DRIVE_MOTOR_ZERO_POWER = DcMotor.ZeroPowerBehavior.BRAKE;
 
     public DcMotorEx armMotor = null;
@@ -26,6 +26,7 @@ public class Robot {
     public DcMotor frontLeftMotor = null;
     public DcMotor backRightMotor = null;
     public DcMotor backLeftMotor = null;
+    public DcMotor wristMotor = null;
     public IMU imu = null;
 
     public enum ClawState {
@@ -60,6 +61,9 @@ public class Robot {
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        wristMotor = hardwareMap.get(DcMotor.class, "wristMotor");
+        wristMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         frontRightMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
         backRightMotor = hardwareMap.get(DcMotor.class, "rightBackMotor");
