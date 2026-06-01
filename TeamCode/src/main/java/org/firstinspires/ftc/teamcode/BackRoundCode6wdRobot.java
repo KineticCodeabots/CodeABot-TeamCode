@@ -33,7 +33,7 @@ public class BackRoundCode6wdRobot {
         double leftPower = throttle + spin;// Calculating power to each motor
         double rightPower = throttle - spin;
 
-        double largest = Math.max(Math.abs(leftPower),Math.abs(rightPower));  // makes sure make power = 1.0
+        double largest = Math.max(Math.abs(leftPower),Math.abs(rightPower));  // makes sure that the motors max power = 1.0
         if (largest > 1.0){
             leftPower /= largest;
             rightPower /= largest;
