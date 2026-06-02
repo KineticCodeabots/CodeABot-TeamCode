@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.archive;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+@Disabled
 public class PID {
     protected double Kp;
     protected double Ki;

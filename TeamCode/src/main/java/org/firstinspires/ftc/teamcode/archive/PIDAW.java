@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.archive;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+@Disabled
 /**
  * A PID controller with anti-windup
  */

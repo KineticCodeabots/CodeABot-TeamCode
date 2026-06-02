@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.archive;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-
+@Disabled
 @Config
 public class AutoRobot {
     public static double COUNTS_PER_INCH = 1;

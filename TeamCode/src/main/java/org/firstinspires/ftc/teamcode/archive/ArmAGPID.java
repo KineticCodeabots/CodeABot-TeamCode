@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.archive;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.Range;
-
+@Disabled
 public class ArmAGPID extends PID {
     public ArmAGPID(double Kp, double Ki, double Kd) {
         super(Kp, Ki, Kd);

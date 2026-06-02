@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode.archive;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
-
+@Disabled
 abstract public class GamepadOpMode extends OpMode {
     Gamepad currentGamepad1 = new Gamepad();
     Gamepad currentGamepad2 = new Gamepad();

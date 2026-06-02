@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.archive;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
-
+@Disabled
 public class Auto extends LinearOpMode {
     public static int DRIVE_FORWARD_DISTANCE = 1600;
     public static int SPECIMEN_ARM_POSITION = 1070;
