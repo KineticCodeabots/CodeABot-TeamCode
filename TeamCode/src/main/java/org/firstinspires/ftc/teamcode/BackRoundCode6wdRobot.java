@@ -29,7 +29,7 @@ public class BackRoundCode6wdRobot {
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-    public void drive(double throttle, double spin, double intakePower){ //Makes it so that the max power of the motor is 1.0
+    public void drive(double throttle, double spin, double intakePower){ //Makes Public void so that TeleOp_6wdRobot can use the variables 
         double leftPower = throttle + spin;// Calculating power to each motor
         double rightPower = throttle - spin;
 
