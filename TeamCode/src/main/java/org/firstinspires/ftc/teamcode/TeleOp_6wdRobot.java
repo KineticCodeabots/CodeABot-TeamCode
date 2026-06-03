@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp
+@TeleOp(name = "6wdRobot", group = "TeleOp")
 
 public class TeleOp_6wdRobot extends OpMode {
     BackRoundCode6wdRobot drive = new BackRoundCode6wdRobot();
