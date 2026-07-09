@@ -2,39 +2,59 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class BackRoundCode_MecanumDrive {
-    private DcMotor frontLeft, frontRight, backLeft, backRight;
-    private IMU imu;
+    private DcMotor frontLeft, frontRight, backLeft, backRight, intake, BackPlateMotor;
+    private DcMotorEx flywheelLeft, flywheelRight;
+
+    private Servo leftServo, rightServo;
+
+    private static final double TICKS_PER_REV = 28.0;
 
     public void init(HardwareMap hwMap){
         frontLeft = hwMap.get(DcMotor.class, "frontLeft");
         backLeft = hwMap.get(DcMotor.class, "backLeft");
         frontRight = hwMap.get(DcMotor.class, "frontRight");
         backRight = hwMap.get(DcMotor.class, "backRight");
+        intake = hwMap.get(DcMotor.class, "intakeMotor");
+        flywheelLeft = hwMap.get(DcMotorEx.class, "flywheelLeft");
+        flywheelRight = hwMap.get(DcMotorEx.class, "flywheelRight");
+        leftServo = hwMap.get(Servo.class, "leftServo");
+        rightServo = hwMap.get(Servo.class, "rightServo");
+        BackPlateMotor = hwMap.get(DcMotor.class, "BackPlateMotor");
+
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        flywheelLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftServo.setDirection(Servo.Direction.REVERSE);
 
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        imu = hwMap.get(IMU.class,"imu");
-        RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.LEFT
-        );
-        imu.initialize(new IMU.Parameters(RevOrientation));
-
+        flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        BackPlateMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-    public void drive(double forward, double strafe, double turn){
+    public void drive(double forward, double strafe, double turn, double intakePower, double flywheelRPM, double LeftServoPosition, double RightServoPosition,
+                      double BackPlatePower){
         double frontLeftPower = forward + strafe + turn;
         double backLeftPower = forward - strafe + turn;
         double frontRightPower = forward - strafe - turn;
@@ -51,5 +71,16 @@ public class BackRoundCode_MecanumDrive {
         backLeft.setPower(maxSpeed * backLeftPower / maxPower);
         frontRight.setPower(maxSpeed * frontRightPower / maxPower);
         backRight.setPower(maxSpeed * backRightPower / maxPower);
+
+        intake.setPower(intakePower);
+
+        flywheelLeft.setVelocity(flywheelRPM * TICKS_PER_REV / 60);
+        flywheelRight.setVelocity(flywheelRPM * TICKS_PER_REV / 60);
+
+        leftServo.setPosition(LeftServoPosition);
+        rightServo.setPosition(RightServoPosition);
+
+        BackPlateMotor.setPower(BackPlatePower);
+
     }
 }
