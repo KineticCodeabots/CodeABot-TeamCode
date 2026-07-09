@@ -74,6 +74,8 @@ public class BackRoundCode_MecanumDrive {
 
         intake.setPower(intakePower);
 
+        ActualFlywheelRPM = (flywheelLeft.getVelocity() / 28) * 60;
+
         flywheelLeft.setVelocity(flywheelRPM * TICKS_PER_REV / 60);
         flywheelRight.setVelocity(flywheelRPM * TICKS_PER_REV / 60);
 
