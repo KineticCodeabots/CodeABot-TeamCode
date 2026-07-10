@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
@@ -13,9 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class BackRoundCode_MecanumDrive {
     private DcMotor frontLeft, frontRight, backLeft, backRight, intake, BackPlateMotor;
     private DcMotorEx flywheelLeft, flywheelRight;
-
     private Servo leftServo, rightServo;
-
     private static final double TICKS_PER_REV = 28.0;
 
     public void init(HardwareMap hwMap){
@@ -53,7 +50,7 @@ public class BackRoundCode_MecanumDrive {
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BackPlateMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-    public void drive(double forward, double strafe, double turn, double intakePower, double flywheelRPM, double LeftServoPosition, double RightServoPosition,
+    public void drive(double forward, double strafe, double turn, double intakePower, double flywheelRPM, double LeftServoPosition, double RightServoPosition, double ActualFlywheelRPM,
                       double BackPlatePower){
         double frontLeftPower = forward + strafe + turn;
         double backLeftPower = forward - strafe + turn;

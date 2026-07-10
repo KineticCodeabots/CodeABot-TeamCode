@@ -2,16 +2,19 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp(name = "Robot TeleOP", group = "Teleop")
 public class TeleOP_MecanumDrive extends OpMode {
     BackRoundCode_MecanumDrive drive = new BackRoundCode_MecanumDrive();
-    double forward, strafe, turn, intakePower, flywheelRPM, LeftServoPosition, RightServoPosition, BackPlatePower;
+    double forward, strafe, turn, intakePower, flywheelRPM, LeftServoPosition, RightServoPosition, BackPlatePower,  ActualFlywheelRPM;
 
     @Override
     public void init() {
         drive.init(hardwareMap);
     }
+
 
     @Override
     public void loop() {
@@ -54,17 +57,12 @@ public class TeleOP_MecanumDrive extends OpMode {
         } else if (gamepad1.dpad_down) {
             BackPlatePower = -0.5;
         }
-
-        telemetry.addData("Left Front Power",forward + strafe + turn );
-        telemetry.addData("Right Front Power",forward - strafe - turn );
-        telemetry.addData("Left Back Power",forward - strafe + turn );
-        telemetry.addData("Right Back Power",forward + strafe - turn);
-        telemetry.addData("Flywheel RPM", flywheelRPM);
+        telemetry.addData("Flywheel RPM", ActualFlywheelRPM);
         if (LeftServoPosition == 0){
             telemetry.addData("Gate Position is ", "closed");
         } else if (LeftServoPosition == 1) {
             telemetry.addData("Gate Position is ", "open");
         }
-        drive.drive(-forward, strafe, turn, flywheelRPM, intakePower, LeftServoPosition, RightServoPosition, BackPlatePower);
+        drive.drive(-forward, strafe, turn, flywheelRPM, intakePower, LeftServoPosition, RightServoPosition, BackPlatePower,  ActualFlywheelRPM);
     }
 }
