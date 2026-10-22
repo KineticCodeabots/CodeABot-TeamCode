@@ -50,7 +50,6 @@ public class AutoConfigurator extends LinearOpMode {
                 Auto.START_DELAY = 0;
             }
 
-
             Map<String, Object> configurations = new LinkedHashMap<>();
             configurations.put("Speed", Auto.DRIVE_SPEED);
             configurations.put("Drive Forward Distance", Auto.DRIVE_FORWARD_DISTANCE);

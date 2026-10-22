@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.archive;
 
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,7 +13,6 @@ public class BackRoundCode_MecanumDrive {
     private DcMotor frontLeft, frontRight, backLeft, backRight, intake, BackPlateMotor;
     private DcMotorEx flywheelLeft, flywheelRight;
     private Servo leftServo, rightServo;
-    private static final double TICKS_PER_REV = 28.0;
 
     public void init(HardwareMap hwMap){
         frontLeft = hwMap.get(DcMotor.class, "frontLeft");
@@ -32,6 +31,7 @@ public class BackRoundCode_MecanumDrive {
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheelLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         leftServo.setDirection(Servo.Direction.REVERSE);
+        flywheelRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -50,7 +50,7 @@ public class BackRoundCode_MecanumDrive {
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BackPlateMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-    public void drive(double forward, double strafe, double turn, double intakePower, double flywheelRPM, double LeftServoPosition, double RightServoPosition, double ActualFlywheelRPM,
+    public void drive(double forward, double strafe, double turn, double intakePower, double flywheelPowerR,double flywheelPowerL, double LeftServoPosition, double RightServoPosition,
                       double BackPlatePower){
         double frontLeftPower = forward + strafe + turn;
         double backLeftPower = forward - strafe + turn;
@@ -71,15 +71,13 @@ public class BackRoundCode_MecanumDrive {
 
         intake.setPower(intakePower);
 
-        ActualFlywheelRPM = (flywheelLeft.getVelocity() / 28) * 60;
-
-        flywheelLeft.setVelocity(flywheelRPM * TICKS_PER_REV / 60);
-        flywheelRight.setVelocity(flywheelRPM * TICKS_PER_REV / 60);
+        double TICKS_PER_REV = 28;
+        flywheelLeft.setVelocity(flywheelPowerL * TICKS_PER_REV / 600);
+        flywheelRight.setVelocity(flywheelPowerR * TICKS_PER_REV / 600);
 
         leftServo.setPosition(LeftServoPosition);
         rightServo.setPosition(RightServoPosition);
 
         BackPlateMotor.setPower(BackPlatePower);
-
     }
 }
