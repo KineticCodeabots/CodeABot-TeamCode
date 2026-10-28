@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode.archive;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
+@Disabled
 @TeleOp(name = "Robot TeleOP", group = "Teleop")
 public class TeleOP_MecanumDrive extends OpMode {
     BackRoundCode_MecanumDrive drive = new BackRoundCode_MecanumDrive();

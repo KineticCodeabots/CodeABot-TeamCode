@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.archive;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
+@Disabled
 @TeleOp(name = "6wdRobot", group = "TeleOp")
 
 public class TeleOp_6wdRobot extends OpMode {

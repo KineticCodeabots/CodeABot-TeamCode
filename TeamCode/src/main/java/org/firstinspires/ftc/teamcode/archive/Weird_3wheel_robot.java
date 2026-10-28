@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.archive;
 
 import com.qualcomm.hardware.motors.RevRoboticsCoreHexMotor;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "Weird_3wheel_robot", group = "TeleOp")
 
-
+@Disabled
 public class Weird_3wheel_robot extends OpMode {
     @Override
     public void init() {

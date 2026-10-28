@@ -13,6 +13,8 @@ public class SecondRobotTeleOP extends LinearOpMode {
         DcMotor LeftMotor = hardwareMap.dcMotor.get("LeftMotor");
         DcMotor RightMotor = hardwareMap.dcMotor.get("RightMotor");
         DcMotor IntakeMotor = hardwareMap.dcMotor.get("IntakeMotor");
+        DcMotor FlywheelMotor = hardwareMap.dcMotor.get("FlywheelMotor");
+        DcMotor TransferMotor = hardwareMap.dcMotor.get("TransferMotor");
         double MaxSpeed = 1.0;
 
         RightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -75,7 +77,16 @@ public class SecondRobotTeleOP extends LinearOpMode {
 
             LeftMotor.setPower(LeftPower);
             RightMotor.setPower(RightPower);
-            IntakeMotor.setPower(gamepad1.right_trigger * MaxSpeed);
+            IntakeMotor.setPower(gamepad1.right_trigger);
+            TransferMotor.setPower(gamepad1.left_trigger);
+
+            if (gamepad1.a) {
+                FlywheelMotor.setPower(1);
+            } else if (gamepad1.x) {
+                FlywheelMotor.setPower(0.5);
+            } else if (gamepad1.y) {
+                FlywheelMotor.setPower(0.25);
+            }
 
             telemetry.update();
         }
