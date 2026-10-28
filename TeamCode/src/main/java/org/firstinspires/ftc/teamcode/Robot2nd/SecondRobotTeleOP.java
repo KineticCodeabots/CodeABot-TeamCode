@@ -86,6 +86,8 @@ public class SecondRobotTeleOP extends LinearOpMode {
                 FlywheelMotor.setPower(0.5);
             } else if (gamepad1.y) {
                 FlywheelMotor.setPower(0.25);
+            } else if (gamepad1.b) {
+                FlywheelMotor.setPower(0);
             }
 
             telemetry.update();
