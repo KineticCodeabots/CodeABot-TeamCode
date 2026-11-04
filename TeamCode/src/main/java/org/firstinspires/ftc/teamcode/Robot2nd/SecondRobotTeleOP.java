@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Robot2nd;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
@@ -13,7 +14,7 @@ public class SecondRobotTeleOP extends LinearOpMode {
         DcMotor LeftMotor = hardwareMap.dcMotor.get("LeftMotor");
         DcMotor RightMotor = hardwareMap.dcMotor.get("RightMotor");
         DcMotor IntakeMotor = hardwareMap.dcMotor.get("IntakeMotor");
-        DcMotor FlywheelMotor = hardwareMap.dcMotor.get("FlywheelMotor");
+        DcMotorEx FlywheelMotor = hardwareMap.get(DcMotorEx.class, "FlywheelMotor");
         DcMotor TransferMotor = hardwareMap.dcMotor.get("TransferMotor");
         double MaxSpeed = 1.0;
 
@@ -65,7 +66,7 @@ public class SecondRobotTeleOP extends LinearOpMode {
 
         while (opModeIsActive()) {
             telemetry.addData("Max Speed", MaxSpeed);
-            double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+            double y = -gamepad1.left_stick_y; // Y stick value is reversed
             double x = gamepad1.right_stick_x;
 
             // Denominator is the largest motor power (absolute value) or 1
@@ -81,13 +82,9 @@ public class SecondRobotTeleOP extends LinearOpMode {
             TransferMotor.setPower(gamepad1.left_trigger);
 
             if (gamepad1.a) {
-                FlywheelMotor.setPower(1);
+                FlywheelMotor.setVelocity(6000);
             } else if (gamepad1.x) {
-                FlywheelMotor.setPower(0.5);
-            } else if (gamepad1.y) {
-                FlywheelMotor.setPower(0.25);
-            } else if (gamepad1.b) {
-                FlywheelMotor.setPower(0);
+                FlywheelMotor.setVelocity(0);
             }
 
             telemetry.update();
