@@ -27,7 +27,6 @@ public class BackRoundCode_MecanumDrive {
         rightServo = hwMap.get(Servo.class, "rightServo");
         BackPlateMotor = hwMap.get(DcMotor.class, "BackPlateMotor");
 
-
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheelLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -51,7 +50,8 @@ public class BackRoundCode_MecanumDrive {
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BackPlateMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-    public void drive(double forward, double strafe, double turn, double intakePower, double flywheelPowerR,double flywheelPowerL, double LeftServoPosition, double RightServoPosition,
+    public void drive(double forward, double strafe, double turn, double intakePower, double flywheelPowerR,double flywheelPowerL,
+                      double LeftServoPosition, double RightServoPosition,
                       double BackPlatePower){
         double frontLeftPower = forward + strafe + turn;
         double backLeftPower = forward - strafe + turn;

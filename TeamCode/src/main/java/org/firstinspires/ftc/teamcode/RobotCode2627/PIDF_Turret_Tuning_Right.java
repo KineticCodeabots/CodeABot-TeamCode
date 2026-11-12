@@ -52,7 +52,7 @@ public class PIDF_Turret_Tuning_Right extends OpMode {
                 DcMotor.RunMode.RUN_USING_ENCODER);
 
         FlywheelRight.setDirection(
-                DcMotorSimple.Direction.REVERSE);
+                DcMotorSimple.Direction.FORWARD);
 
         // Start from the motor's configured PIDF values
         PIDFCoefficients initial =
