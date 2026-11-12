@@ -32,29 +32,28 @@ public class init_class {
 
         frontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);  //Sets Motors RunMode to using a encoder for high control over the robots driving and sets the motors brake mode to BRAKE
         backRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         Turret.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         FlywheelLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         FlywheelRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        //Sets Motors RunMode to using a encoder for high control over the robots driving and sets the motors brake mode to BRAKE
 
-        frontLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorEx.Direction.REVERSE); // setting motor direction
         backLeft.setDirection(DcMotorEx.Direction.REVERSE);
         FlywheelRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-    public void drive(double forward, double strafe, double turn, double intakePower, double flywheelPowerR,double flywheelPowerL, double GateServoPos){
+    public void drive(double forward, double strafe, double turn, double intakePower, double flywheelPowerR,double flywheelPowerL, double GateServoPos){ //Variables to set actuators power and speed
         double frontLeftPower = forward + strafe + turn;
-        double backLeftPower = forward - strafe + turn;
+        double backLeftPower = forward - strafe + turn;  // basic calculations for Mecanum Drivetrain
         double frontRightPower = forward - strafe - turn;
         double backRightPower = forward + strafe - turn;
 
-        double maxPower = 1.0;
+        double maxPower = 1.0; //setting maximum power/speed of drivetrain
         double maxSpeed = 1.0;
 
         maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
-        maxPower = Math.max(maxPower, Math.abs(backLeftPower));
+        maxPower = Math.max(maxPower, Math.abs(backLeftPower)); //making sure the Power set to the motors never goes over 1
         maxPower = Math.max(maxPower, Math.abs(frontRightPower));
         maxPower = Math.max(maxPower, Math.abs(backRightPower));
 
@@ -62,13 +61,9 @@ public class init_class {
         backLeft.setPower(maxSpeed * backLeftPower / maxPower);
         frontRight.setPower(maxSpeed * frontRightPower / maxPower);
         backRight.setPower(maxSpeed * backRightPower / maxPower);
-
-        intake.setVelocity(intakePower);
-
+        intake.setVelocity(intakePower);    // setting the Speed/Power of the actuators with the variables created earlier
         FlywheelLeft.setVelocity(flywheelPowerL);
         FlywheelRight.setVelocity(flywheelPowerR);
-
         GateServo.setPosition(GateServoPos);
-
     }
 }
