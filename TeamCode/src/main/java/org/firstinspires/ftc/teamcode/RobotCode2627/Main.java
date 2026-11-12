@@ -36,7 +36,7 @@ public class Main extends OpMode {
         FlywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         FlywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        telemetry.addData("Joel", "Welcome to the jungle!");
+        telemetry.addLine("Joel, Welcome to the jungle!"); //if confused by random telemetry, it is a inside joke between Joel + Miles 
     }
 
     @Override
