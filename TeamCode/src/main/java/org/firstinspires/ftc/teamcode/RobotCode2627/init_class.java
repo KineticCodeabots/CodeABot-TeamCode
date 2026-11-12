@@ -43,7 +43,7 @@ public class init_class {
         backLeft.setDirection(DcMotorEx.Direction.REVERSE);
         FlywheelRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-    public void drive(double forward, double strafe, double turn, double intakePower, double flywheelPowerR,double flywheelPowerL, double GateServoPos){ //Variables to set actuators power and speed
+    public void drive(double forward, double strafe, double turn, double intakeVelocity, double flywheelVelocityR,double flywheelVelocityL, double GateServoPos){ //Variables to set actuators power and speed
         double frontLeftPower = forward + strafe + turn;
         double backLeftPower = forward - strafe + turn;  // basic calculations for Mecanum Drivetrain
         double frontRightPower = forward - strafe - turn;
@@ -61,9 +61,9 @@ public class init_class {
         backLeft.setPower(maxSpeed * backLeftPower / maxPower);
         frontRight.setPower(maxSpeed * frontRightPower / maxPower);
         backRight.setPower(maxSpeed * backRightPower / maxPower);
-        intake.setVelocity(intakePower);    // setting the Speed/Power of the actuators with the variables created earlier
-        FlywheelLeft.setVelocity(flywheelPowerL);
-        FlywheelRight.setVelocity(flywheelPowerR);
+        intake.setVelocity(intakeVelocity);    // setting the Speed/Power of the actuators with the variables created earlier
+        FlywheelLeft.setVelocity(flywheelVelocityL);
+        FlywheelRight.setVelocity(flywheelVelocityR);
         GateServo.setPosition(GateServoPos);
     }
 }
