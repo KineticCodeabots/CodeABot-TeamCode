@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import java.util.List;
 
 /**
- * BIOBUZZ hardware: mecanum, intake, direct-drive flywheels and 200-degree turret.
+ * BIO-BUZZ hardware: mecanum, intake, direct-drive flywheels and 200-degree turret.
  * Gate servo intentionally NOT initialized or commanded.
  */
 public class init_class {
@@ -24,6 +25,7 @@ public class init_class {
 
     private DcMotorEx frontLeft, backLeft, frontRight, backRight;
     private DcMotorEx intake, flywheelLeft, flywheelRight, turret;
+    private Servo TurretGate, FLowerIntakeL, FlowerIntakeR;
     private Limelight3A limelight;
 
     // ================== CHECK THESE SETTINGS ==================
@@ -91,11 +93,15 @@ public class init_class {
         flywheelRight = hwMap.get(DcMotorEx.class, "FlywheelRight");
         turret = hwMap.get(DcMotorEx.class, "Turret");
         limelight = hwMap.get(Limelight3A.class, "limelight");
+        TurretGate = hwMap.get(Servo.class, "turretGate");
+        FlowerIntakeR = hwMap.get(Servo.class, "FlowerIntakeR");
+        FLowerIntakeL = hwMap.get(Servo.class, "FlowerIntakeL");
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheelRight.setDirection(DcMotorSimple.Direction.REVERSE);
         turret.setDirection(DcMotorSimple.Direction.FORWARD);
+        FLowerIntakeL.setDirection(Servo.Direction.REVERSE);
 
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -121,6 +127,9 @@ public class init_class {
         flywheelLeft.setVelocity(0);
         flywheelRight.setVelocity(0);
         turretZeroed = false;
+        TurretGate.setPosition(0);
+        FlowerIntakeR.setPosition(0);
+        FLowerIntakeL.setPosition(0);
         clock.reset();
 
         limelight.setPollRateHz(60);
@@ -148,6 +157,13 @@ public class init_class {
 
     public void setIntakeVelocity(double ticksPerSecond) {
         intake.setVelocity(ticksPerSecond);
+    }
+    public void setGatePOS(double GatePos){
+        TurretGate.setPosition(GatePos);
+    }
+    public void setFIpos(double FIpos) {
+        FLowerIntakeL.setPosition(FIpos);
+        FlowerIntakeR.setPosition(FIpos);
     }
 
     public Alliance getAlliance() { return alliance; }

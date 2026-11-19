@@ -11,13 +11,16 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleOP extends OpMode {
 
     private final init_class drive = new init_class();
-
     // Manual edge detection, compatible with older FTC SDKs.
     private boolean aWasDown = false;
     private boolean leftWasDown = false;
     private boolean rightWasDown = false;
     private boolean upWasDown = false;
-
+    private boolean RightDPadWasDown = false;
+    private boolean LeftDPadWasDown = false;
+    private boolean yWasDown = false;
+    
+   
     @Override
     public void init() {
         drive.init(hardwareMap);
@@ -62,12 +65,16 @@ public class TeleOP extends OpMode {
         drive.driveMotors(forward, strafe, turn);
 
         // Gamepad 2: intake; 1000 encoder ticks/s (from your original code).
-        drive.setIntakeVelocity(gamepad2.left_bumper ? 1000.0 : 0.0);
+        drive.setIntakeVelocity(gamepad2.left_bumper ? 3000.0 : 0.0);
 
         // Gamepad 2 D-pad: manually choose scoring/audience group or AUTO.
         boolean left = gamepad2.dpad_left;
         boolean right = gamepad2.dpad_right;
         boolean up = gamepad2.dpad_up;
+        boolean DpadLeft = gamepad2.dpad_left;
+        boolean DpadRight = gamepad2.dpad_right;
+        boolean Y = gamepad1.y;
+
         if (left && !leftWasDown) {
             drive.setTargetMode(init_class.TargetMode.AUDIENCE);
         } else if (right && !rightWasDown) {
@@ -75,9 +82,16 @@ public class TeleOP extends OpMode {
         } else if (up && !upWasDown) {
             drive.setTargetMode(init_class.TargetMode.AUTO);
         }
+        if(DpadRight && !RightDPadWasDown){
+            drive.setGatePOS(1);
+        }else if(DpadLeft && !LeftDPadWasDown){
+            drive.setGatePOS(0);
+        }
+
         leftWasDown = left;
         rightWasDown = right;
         upWasDown = up;
+
 
         // Read camera ONCE each loop, share result with turret + shooter.
         drive.updateVision();
