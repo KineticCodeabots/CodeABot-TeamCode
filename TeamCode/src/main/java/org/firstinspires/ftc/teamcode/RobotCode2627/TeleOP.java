@@ -19,6 +19,7 @@ public class TeleOP extends OpMode {
     private boolean RightDPadWasDown = false;
     private boolean LeftDPadWasDown = false;
     private boolean yWasDown = false;
+    private boolean BWasDown = false;
     
    
     @Override
@@ -64,6 +65,11 @@ public class TeleOP extends OpMode {
         double turn = gamepad1.right_stick_x;
         drive.driveMotors(forward, strafe, turn);
 
+        double GateClosed = 0;
+        double GateOpened = 1;
+        double FIdown = 1;
+        double FIup = 0;
+
         // Gamepad 2: intake; 1000 encoder ticks/s (from your original code).
         drive.setIntakeVelocity(gamepad2.left_bumper ? 3000.0 : 0.0);
 
@@ -74,6 +80,7 @@ public class TeleOP extends OpMode {
         boolean DpadLeft = gamepad2.dpad_left;
         boolean DpadRight = gamepad2.dpad_right;
         boolean Y = gamepad1.y;
+        boolean B = gamepad1.b;
 
         if (left && !leftWasDown) {
             drive.setTargetMode(init_class.TargetMode.AUDIENCE);
@@ -83,15 +90,23 @@ public class TeleOP extends OpMode {
             drive.setTargetMode(init_class.TargetMode.AUTO);
         }
         if(DpadRight && !RightDPadWasDown){
-            drive.setGatePOS(1);
+            drive.setGatePOS(GateClosed);
         }else if(DpadLeft && !LeftDPadWasDown){
-            drive.setGatePOS(0);
+            drive.setGatePOS(GateOpened);
+        }
+        if(Y && !yWasDown){
+            drive.setFIpos(FIup);
+        }else if(B && !BWasDown){
+            drive.setFIpos(FIdown);
         }
 
         leftWasDown = left;
         rightWasDown = right;
         upWasDown = up;
-
+        LeftDPadWasDown = DpadLeft;
+        RightDPadWasDown = DpadRight;
+        yWasDown = Y;
+        BWasDown = B;
 
         // Read camera ONCE each loop, share result with turret + shooter.
         drive.updateVision();
@@ -120,6 +135,7 @@ public class TeleOP extends OpMode {
         telemetry.addData("Left RPM", "%.0f", drive.getLeftFlywheelRPM());
         telemetry.addData("Right RPM", "%.0f", drive.getRightFlywheelRPM());
         telemetry.addData("At speed", drive.isFlywheelAtSpeed());
+        
         telemetry.update();
     }
 
